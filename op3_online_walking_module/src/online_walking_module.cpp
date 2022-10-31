@@ -452,9 +452,12 @@ void OnlineWalkingModule::calcBalanceControl()
 {
   if (is_balancing_ == true)
   {
+    ROS_INFO("started balance calculation");
     double cur_time = (double) balance_step_ * control_cycle_sec_;
+    ROS_INFO("curtime = %f", cur_time);
     des_balance_gain_ratio_ = balance_tra_->getPosition(cur_time);
-
+    ROS_INFO("des balance gain ratio");
+    ROS_INFO("balance step = %d vs balance size = %d",balance_step_,balance_size_);
     if (balance_step_ == balance_size_-1)
     {
       balance_step_ = 0;
@@ -470,6 +473,7 @@ void OnlineWalkingModule::calcBalanceControl()
       ROS_INFO("[END] Balance Gain");
     }
     else
+      ROS_INFO("elsed out");
       balance_step_++;
   }
 }
@@ -965,6 +969,7 @@ void OnlineWalkingModule::footStep2DCallback(const op3_online_walking_module_msg
 void OnlineWalkingModule::footStepCommandCallback(const op3_online_walking_module_msgs::FootStepCommand& msg)
 {
   if (enable_ == false)
+    ROS_WARN("enable is false");
     return;
 
   if (balance_type_ == OFF)
@@ -1021,6 +1026,7 @@ void OnlineWalkingModule::initWalkingControl()
     if (is_moving_ == true)
     {
       // TODO
+      ROS_INFO("TODO Triggered");
     }
     else
     {
@@ -1046,7 +1052,7 @@ void OnlineWalkingModule::initWalkingControl()
 
       initFeedforwardControl();
 
-      ROS_INFO("[START] Walking Control (%d/%d)", walking_step_+1, walking_size_);
+      ROS_INFO("[START] Walking Control #1 (%d/%d)", walking_step_+1, walking_size_);
     }
 
     walking_initialize_ = true;
@@ -1093,7 +1099,7 @@ void OnlineWalkingModule::calcWalkingControl()
       else
       {
         walking_step_++;
-        ROS_INFO("[START] Walking Control (%d/%d)", walking_step_+1, walking_size_);
+        ROS_INFO("[START] Walking Control #2 (%d/%d)", walking_step_+1, walking_size_);
       }
     }
     else
@@ -1121,6 +1127,7 @@ void OnlineWalkingModule::initFeedforwardControl()
                                                  zero_vector, zero_vector, zero_vector,
                                                  zero_vector, zero_vector, zero_vector,
                                                  via_pos, zero_vector, zero_vector);
+  ROS_INFO("ff control initialized");
 }
 
 void OnlineWalkingModule::calcRobotPose()
@@ -1186,6 +1193,7 @@ void OnlineWalkingModule::calcRobotPose()
   g_to_l_leg.coeffRef(2,3) = l_leg_pos[2];
 
   op3_kdl_->finalize();
+  
 }
 
 void OnlineWalkingModule::setTargetForceTorque()
@@ -1284,6 +1292,7 @@ void OnlineWalkingModule::setBalanceControlGain()
 
 bool OnlineWalkingModule::setBalanceControl()
 {
+  ROS_INFO("Setting Balance Control");
   // Set Balance Control
   balance_control_.setGyroBalanceEnable(true);
   balance_control_.setOrientationBalanceEnable(true);
@@ -1295,6 +1304,7 @@ bool OnlineWalkingModule::setBalanceControl()
   setTargetForceTorque();
 
   bool ik_success = true;
+  ROS_INFO("checkpoint 1");
 
   // Body Pose
   Eigen::MatrixXd des_body_pos = Eigen::MatrixXd::Zero(3,1);
@@ -1306,6 +1316,8 @@ bool OnlineWalkingModule::setBalanceControl()
   Eigen::MatrixXd des_body_rot = robotis_framework::convertQuaternionToRotation(des_body_Q);
   Eigen::MatrixXd des_body_rpy = robotis_framework::convertQuaternionToRPY(des_body_Q);
 
+  ROS_INFO("checkpoint 2");
+
   // Right Leg Pose
   Eigen::MatrixXd des_r_foot_pos = Eigen::MatrixXd::Zero(3,1);
   des_r_foot_pos.coeffRef(0,0) = des_r_leg_pos_[0];
@@ -1315,6 +1327,7 @@ bool OnlineWalkingModule::setBalanceControl()
   Eigen::Quaterniond des_r_foot_Q(des_r_leg_Q_[3],des_r_leg_Q_[0],des_r_leg_Q_[1],des_r_leg_Q_[2]);
   Eigen::MatrixXd des_r_foot_rot = robotis_framework::convertQuaternionToRotation(des_r_foot_Q);
 
+  ROS_INFO("checkpoint 3");
   // Left Leg Pose
   Eigen::MatrixXd des_l_foot_pos = Eigen::MatrixXd::Zero(3,1);
   des_l_foot_pos.coeffRef(0,0) = des_l_leg_pos_[0];
@@ -1324,6 +1337,7 @@ bool OnlineWalkingModule::setBalanceControl()
   Eigen::Quaterniond des_l_foot_Q(des_l_leg_Q_[3],des_l_leg_Q_[0],des_l_leg_Q_[1],des_l_leg_Q_[2]);
   Eigen::MatrixXd des_l_foot_rot = robotis_framework::convertQuaternionToRotation(des_l_foot_Q);
 
+  ROS_INFO("checkpoint 4");
   // Set Desired Value for Balance Control
   Eigen::MatrixXd body_pose = Eigen::MatrixXd::Identity(4,4);
   body_pose.block<3,3>(0,0) = des_body_rot;
@@ -1337,6 +1351,7 @@ bool OnlineWalkingModule::setBalanceControl()
   r_foot_pose.block<3,3>(0,0) = des_r_foot_rot;
   r_foot_pose.block<3,1>(0,3) = des_r_foot_pos;
 
+  ROS_INFO("checkpoint 5");
   // ===== Transformation =====
   Eigen::MatrixXd robot_to_body = Eigen::MatrixXd::Identity(4,4);
   Eigen::MatrixXd robot_to_l_foot = body_pose.inverse() * l_foot_pose;
@@ -1356,6 +1371,7 @@ bool OnlineWalkingModule::setBalanceControl()
       robotis_framework::convertRotationToRPY(robotis_framework::getRotationX(M_PI) * imu_quaternion.toRotationMatrix() * robotis_framework::getRotationZ(M_PI));
 
   imu_data_mutex_lock_.unlock();
+  ROS_INFO("checkpoint 6");
 
   // Set FT
   Eigen::MatrixXd robot_to_r_foot_force =
@@ -1437,16 +1453,18 @@ bool OnlineWalkingModule::setBalanceControl()
 
   Eigen::Quaterniond des_r_foot_Q_mod = robotis_framework::convertRotationToQuaternion(des_r_foot_rot_mod);
   Eigen::Quaterniond des_l_foot_Q_mod = robotis_framework::convertRotationToQuaternion(des_l_foot_rot_mod);
-
+  ROS_INFO("checkpoint 7");
   ik_success = op3_kdl_->solveInverseKinematics(r_leg_output,
                                                 des_r_foot_pos_mod,des_r_foot_Q_mod,
                                                 l_leg_output,
                                                 des_l_foot_pos_mod,des_l_foot_Q_mod);
 
+  ROS_INFO("checkpoint 8");
   op3_kdl_->finalize();
-
+  ROS_INFO("checkpoint 9");
   if (ik_success == true)
   {
+    ROS_INFO("ik_success");
     des_joint_pos_[joint_name_to_id_["r_hip_yaw"]-1]      = r_leg_output[0];
     des_joint_pos_[joint_name_to_id_["r_hip_roll"]-1]     = r_leg_output[1];
     des_joint_pos_[joint_name_to_id_["r_hip_pitch"]-1]    = r_leg_output[2];
@@ -1461,7 +1479,7 @@ bool OnlineWalkingModule::setBalanceControl()
     des_joint_pos_[joint_name_to_id_["l_ank_pitch"]-1]  = l_leg_output[4];
     des_joint_pos_[joint_name_to_id_["l_ank_roll"]-1]   = l_leg_output[5];
   }
-
+  ROS_INFO("checkpoint 10");
   return ik_success;
 }
 
@@ -1641,6 +1659,7 @@ void OnlineWalkingModule::process(std::map<std::string, robotis_framework::Dynam
 
       ROS_INFO("[FAIL] Task Space Control");
     }
+    ROS_INFO("checkpoint 11");
   }
 
   ros::Duration time_duration = ros::Time::now() - begin;

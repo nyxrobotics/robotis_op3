@@ -243,10 +243,12 @@ void OP3Kinematics::initialize(Eigen::MatrixXd pelvis_position, Eigen::MatrixXd 
     min_joint_position_limit(index) = min_position_limit[index]*D2R;
     max_joint_position_limit(index) = max_position_limit[index]*D2R;
   }
+  ROS_INFO("joints, %d",rleg_chain.getNrOfJoints());
+  ROS_INFO("segments, %d",rleg_chain.getNrOfSegments());
 
   /* KDL Solver Initialization */
-  //  rleg_dyn_param_ = new KDL::ChainDynParam(rleg_chain_, KDL::Vector(0.0, 0.0, -9.81)); // kinematics & dynamics parameter
-  //  rleg_jacobian_solver_ = new KDL::ChainJntToJacSolver(rleg_chain__); // jabocian solver
+  //  rleg_dyn_param_ = new KDL::ChainDynParam(rleg_chain, KDL::Vector(0.0, 0.0, -9.81)); // kinematics & dynamics parameter
+  //  rleg_jacobian_solver_ = new KDL::ChainJntToJacSolver(rleg_chain); // jabocian solver
   rleg_fk_solver_ = new KDL::ChainFkSolverPos_recursive(rleg_chain); // forward kinematics solver
 
   // inverse kinematics solver
@@ -256,8 +258,9 @@ void OP3Kinematics::initialize(Eigen::MatrixXd pelvis_position, Eigen::MatrixXd 
                                                         *rleg_fk_solver_,
                                                         *rleg_ik_vel_solver_);
 
-  //  lleg_dyn_param_ = new KDL::ChainDynParam(lleg_chain_, KDL::Vector(0.0, 0.0, -9.81)); // kinematics & dynamics parameter
-  //  lleg_jacobian_solver_ = new KDL::ChainJntToJacSolver(lleg_chain__); // jabocian solver
+  
+  //  lleg_dyn_param_ = new KDL::ChainDynParam(lleg_chain, KDL::Vector(0.0, 0.0, -9.81)); // kinematics & dynamics parameter
+  //  lleg_jacobian_solver_ = new KDL::ChainJntToJacSolver(lleg_chain); // jabocian solver
   lleg_fk_solver_ = new KDL::ChainFkSolverPos_recursive(lleg_chain); // forward kinematics solver
 
   // inverse kinematics solver
@@ -266,6 +269,8 @@ void OP3Kinematics::initialize(Eigen::MatrixXd pelvis_position, Eigen::MatrixXd 
                                                         min_joint_position_limit, max_joint_position_limit,
                                                         *lleg_fk_solver_,
                                                         *lleg_ik_vel_solver_);
+
+                                                        
 }
 
 void OP3Kinematics::setJointPosition(Eigen::VectorXd rleg_joint_position, Eigen::VectorXd lleg_joint_position)
@@ -288,7 +293,10 @@ void OP3Kinematics::solveForwardKinematics(std::vector<double_t> &rleg_position,
   rleg_joint_position.data = rleg_joint_position_;
 
   KDL::Frame rleg_pose;
+  // ROS_INFO("rleg_fk_solver JntToCart [start]");
   rleg_fk_solver_->JntToCart(rleg_joint_position, rleg_pose);
+  // ROS_INFO("rleg_fk_solver JntToCart [end]");
+
 
   rleg_pose_.position.x = rleg_pose.p.x();
   rleg_pose_.position.y = rleg_pose.p.y();
@@ -347,9 +355,9 @@ bool OP3Kinematics::solveInverseKinematics(std::vector<double_t> &rleg_output,
                                                  std::vector<double_t> &lleg_output,
                                                  Eigen::MatrixXd lleg_target_position, Eigen::Quaterniond lleg_target_orientation)
 {
-  //  ROS_INFO("right x: %f, y: %f, z: %f", rleg_target_position(0), rleg_target_position(1), rleg_target_position(2));
-  //  ROS_INFO("left x: %f, y: %f, z: %f", lleg_target_position(0), lleg_target_position(1), lleg_target_position(2));
-
+   ROS_INFO("right x: %f, y: %f, z: %f", rleg_target_position(0), rleg_target_position(1), rleg_target_position(2));
+   ROS_INFO("left x: %f, y: %f, z: %f", lleg_target_position(0), lleg_target_position(1), lleg_target_position(2));
+  
   // rleg
   KDL::JntArray rleg_joint_position;
   rleg_joint_position.data = rleg_joint_position_;
@@ -365,9 +373,24 @@ bool OP3Kinematics::solveInverseKinematics(std::vector<double_t> &rleg_output,
                                                   rleg_target_orientation.w());
 
   KDL::JntArray rleg_desired_joint_position;
+  ROS_INFO("leg joint number : %u",LEG_JOINT_NUM);
+  // ROS_INFO("before resize, %d",rleg_ik_pos_solver_->nj);
+  ROS_INFO("Attempting update internals1");
+  rleg_ik_pos_solver_->updateInternalDataStructures();
+  ROS_INFO("INTERNALS UPDATED!!!");
+  ROS_INFO("Checkpoint 7.1");
   rleg_desired_joint_position.resize(LEG_JOINT_NUM);
+  // ROS_INFO("Attempting update internals2");
+  // rleg_ik_pos_solver_->updateInternalDataStructures();
+  // ROS_INFO("INTERNALS UPDATED!!!");
 
   int rleg_err = rleg_ik_pos_solver_->CartToJnt(rleg_joint_position, rleg_desired_pose, rleg_desired_joint_position);
+  
+  ROS_INFO("INFO rleg error : %d",rleg_err);
+  // ROS_INFO("after resize, %u",rleg_chain.getNrOfJoints());
+  // ROS_INFO(rleg_joint_position.data);
+  // ROS_INFO(rleg_desired_pose.p);
+  // ROS_INFO(rleg_desired_joint_position);
 
   if (rleg_err < 0)
   {
