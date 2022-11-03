@@ -1,0 +1,6 @@
+<launch>
+    <node name="data_collection" pkg="op3_data_collection" type="collection" output="screen"/>
+    
+
+
+</launch>
