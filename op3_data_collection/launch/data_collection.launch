@@ -1,4 +1,7 @@
 <launch>
+    <param name="robot_file_path" value="$(find op3_manager)/config/OP3.robot"/>
+    <param name="init_file_path"  value="$(find op3_manager)/config/dxl_init_OP3.yaml"/>  
+    
     <node name="data_collection" pkg="op3_data_collection" type="collection" output="screen"/>
     
 

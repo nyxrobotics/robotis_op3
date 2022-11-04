@@ -35,18 +35,24 @@ class Collection
             ros::NodeHandle nh;
             ROS_INFO("current_collection->init");
 
+
             // _current_pub = nh.advertise<std::vector<double>>("/collection/currents", 0,this);
             /* Load ROS Parameter */
             // nh.param<std::string>("device_name", g_device_name, SUB_CONTROLLER_DEVICE);
             // nh.param<int>("baud_rate", g_baudrate, BAUD_RATE);
+            
+            nh.param<std::string>("robot_file_path", robot_file_, "");
+            nh.param<std::string>("init_file_path", init_file_, "");
 
             std::string dev_desc_dir_path = ros::package::getPath("robotis_device") + "/devices";
             ROS_INFO("dir path");
             
-            std::string robot_file_path = "/dev/ttyUSB0";
+            // std::string robot_file_path = "/dev/ttyUSB0";
             ROS_INFO("robot path file");
 
-            *robot_ = Robot(robot_file_path, dev_desc_dir_path);
+            // *robot_ = Robot(robot_file_path, dev_desc_dir_path);
+            *robot_ = Robot(robot_file_, dev_desc_dir_path);
+
 
             ROS_INFO("init_finished");
 
@@ -96,6 +102,8 @@ class Collection
         ros::Publisher g_init_pose_pub;
         ros::Publisher g_demo_command_pub;
         ros::Publisher _current_pub;
+        std::string robot_file_ = "";
+        std::string init_file_ = "";
         int rate;
         Robot *robot_;
         uint8_t *error;
