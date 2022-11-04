@@ -35,6 +35,9 @@
 #include "op3_online_walking_module/online_walking_module.h"
 #include "op3_tuning_module/tuning_module.h"
 
+/* Self added */
+#include "std_msgs/Int32MultiArray.h"
+
 using namespace robotis_framework;
 using namespace dynamixel;
 using namespace robotis_op;
@@ -58,6 +61,9 @@ std::string g_device_name;
 
 ros::Publisher g_init_pose_pub;
 ros::Publisher g_demo_command_pub;
+
+ros::Publisher _current_pub;
+std_msgs::Int32MultiArray current_msg;
 
 void buttonHandlerCallback(const std_msgs::String::ConstPtr& msg)
 {
@@ -140,6 +146,31 @@ void dxlTorqueCheckCallback(const std_msgs::String::ConstPtr& msg)
   }
 }
 
+void dxlCurrentCollector()
+{
+  RobotisController *controller = RobotisController::getInstance();
+  // current_msg.resize(controller->robot_->dxls_.size());
+  uint32_t  data32 = 0;
+  // int dxl_index = 0;
+  current_msg.data.clear();
+
+  for (auto& it : controller->robot_->dxls_)
+  {
+    
+    std::string joint_name = it.first;
+    Dynamixel *dxl = it.second;
+    controller->read4Byte(it.first,126,&data32);
+    current_msg.data.push_back(data32);
+    // current_msg[dxl_index] = data32; 
+    // dxl_index ++;
+    // ROS_INFO("joint "+it.first+" has current of %i", data32);
+  }
+  // dxl_index = 0;
+
+  _current_pub.publish(current_msg);
+
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "op3_manager");
@@ -160,6 +191,8 @@ int main(int argc, char **argv)
   ros::Subscriber dxl_torque_sub = nh.subscribe("/robotis/dxl_torque", 1, dxlTorqueCheckCallback);
   g_init_pose_pub = nh.advertise<std_msgs::String>("/robotis/base/ini_pose", 0);
   g_demo_command_pub = nh.advertise<std_msgs::String>("/ball_tracker/command", 0);
+
+  _current_pub = nh.advertise<std_msgs::Int32MultiArray>("/collection/dxl_currents",0);
 
   nh.param<bool>("gazebo", controller->gazebo_mode_, false);
   g_is_simulation = controller->gazebo_mode_;
@@ -261,6 +294,10 @@ int main(int argc, char **argv)
 
   while (ros::ok())
   {
+    if (g_is_simulation == false)
+    {  
+      dxlCurrentCollector();
+    }
     usleep(1 * 1000);
 
     ros::spin();
