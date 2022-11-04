@@ -36,7 +36,7 @@
 #include "op3_tuning_module/tuning_module.h"
 
 /* Self added */
-#include "std_msgs/Int32MultiArray.h"
+#include "std_msgs/UInt32MultiArray.h"
 
 using namespace robotis_framework;
 using namespace dynamixel;
@@ -63,7 +63,7 @@ ros::Publisher g_init_pose_pub;
 ros::Publisher g_demo_command_pub;
 
 ros::Publisher _current_pub;
-std_msgs::Int32MultiArray current_msg;
+std_msgs::UInt32MultiArray current_msg;
 
 void buttonHandlerCallback(const std_msgs::String::ConstPtr& msg)
 {
@@ -148,6 +148,7 @@ void dxlTorqueCheckCallback(const std_msgs::String::ConstPtr& msg)
 
 void dxlCurrentCollector()
 {
+  
   RobotisController *controller = RobotisController::getInstance();
   // current_msg.resize(controller->robot_->dxls_.size());
   uint32_t  data32 = 0;
@@ -156,10 +157,11 @@ void dxlCurrentCollector()
 
   for (auto& it : controller->robot_->dxls_)
   {
+    // ROS_INFO("Current for loop");
     
     std::string joint_name = it.first;
     Dynamixel *dxl = it.second;
-    controller->read4Byte(it.first,126,&data32);
+    controller->read4Byte(it.first,132,&data32);
     current_msg.data.push_back(data32);
     // current_msg[dxl_index] = data32; 
     // dxl_index ++;
@@ -168,7 +170,19 @@ void dxlCurrentCollector()
   // dxl_index = 0;
 
   _current_pub.publish(current_msg);
+  ROS_INFO("Current published");
 
+}
+
+void dxlCurrentCollector_loop()
+{
+  int rate = 10;
+  ros::Rate r(rate);
+  while(ros::ok){
+    dxlCurrentCollector();
+    r.sleep();
+
+  }
 }
 
 int main(int argc, char **argv)
@@ -192,7 +206,7 @@ int main(int argc, char **argv)
   g_init_pose_pub = nh.advertise<std_msgs::String>("/robotis/base/ini_pose", 0);
   g_demo_command_pub = nh.advertise<std_msgs::String>("/ball_tracker/command", 0);
 
-  _current_pub = nh.advertise<std_msgs::Int32MultiArray>("/collection/dxl_currents",0);
+  _current_pub = nh.advertise<std_msgs::UInt32MultiArray>("/collection/dxl_currents",0);
 
   nh.param<bool>("gazebo", controller->gazebo_mode_, false);
   g_is_simulation = controller->gazebo_mode_;
@@ -296,7 +310,7 @@ int main(int argc, char **argv)
   {
     if (g_is_simulation == false)
     {  
-      dxlCurrentCollector();
+      dxlCurrentCollector_loop();
     }
     usleep(1 * 1000);
 
