@@ -34,6 +34,7 @@ class Collection
         Collection(){
             ros::NodeHandle nh;
             ROS_INFO("current_collection->init");
+            controller_.getInstance();
 
 
             // _current_pub = nh.advertise<std::vector<double>>("/collection/currents", 0,this);
@@ -48,10 +49,15 @@ class Collection
             ROS_INFO("dir path");
             
             // std::string robot_file_path = "/dev/ttyUSB0";
-            ROS_INFO("robot path file");
+            // ROS_INFO("robot path file");
+
+            // ROS_INFO(robot_file_);
+            // ROS_INFO(dev_desc_dir_path);
 
             // *robot_ = Robot(robot_file_path, dev_desc_dir_path);
-            *robot_ = Robot(robot_file_, dev_desc_dir_path);
+            controller_.initialize(robot_file_, init_file_);
+            
+            // *robot_ = Robot(robot_file_, dev_desc_dir_path);
 
 
             ROS_INFO("init_finished");
@@ -107,6 +113,7 @@ class Collection
         int rate;
         Robot *robot_;
         uint8_t *error;
+        robotis_framework::RobotisController controller_;
 
 };
 
