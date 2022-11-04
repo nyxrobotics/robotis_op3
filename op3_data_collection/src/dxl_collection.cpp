@@ -25,6 +25,8 @@ RobotisController::RobotisController()
   direct_sync_write_.clear();
 }
 
+FILE *plot = fopen("plot.csv", "w");
+
 class Collection
 {
     public:
@@ -43,6 +45,8 @@ class Collection
             std::string robot_file_path = "/dev/ttyUSB0";
 
             *robot_ = Robot(robot_file_path, dev_desc_dir_path);
+
+            while_func();
 
         }
     
@@ -63,13 +67,26 @@ class Collection
                 if (result == COMM_SUCCESS)
                 {
                     robot_currents[0]=read_data;
+                    ROS_INFO("current reading %f",robot_currents[0]);
                 }
                     
 
             }
-
+            // fprintf(plot,"\n  yaw angle, %5.2f , yaw desired direction, %5.2f , yaw gyro delta, %5.2f , motor 0 , %d, motor 1, %d , motor2 , %d, motor 3, %d ",  yaw_gyro, des_yaw_joy, yaw_gyro_delta,motor0_pwm,motor1_pwm,motor2_pwm,motor3_pwm);
 
         }
+
+        void while_func(){
+            rate = 1;
+            ros::Rate r(rate);
+            ROS_INFO("Entering while function");
+            while(ros::ok){
+                get_current();
+                // ros::spinOnce();
+                r.sleep();
+            }
+        }
+
     private:
         ros::Publisher g_init_pose_pub;
         ros::Publisher g_demo_command_pub;
