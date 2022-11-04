@@ -41,10 +41,14 @@ class Collection
             // nh.param<int>("baud_rate", g_baudrate, BAUD_RATE);
 
             std::string dev_desc_dir_path = ros::package::getPath("robotis_device") + "/devices";
+            ROS_INFO("dir path");
             
             std::string robot_file_path = "/dev/ttyUSB0";
+            ROS_INFO("robot path file");
 
             *robot_ = Robot(robot_file_path, dev_desc_dir_path);
+
+            ROS_INFO("init_finished");
 
             while_func();
 
@@ -52,6 +56,7 @@ class Collection
     
         void get_current()
         {
+            ROS_INFO("get current");
             std::vector<double> robot_currents;
             robot_currents.resize(12);
             for (auto& it : robot_->dxls_)
@@ -72,7 +77,7 @@ class Collection
                     
 
             }
-            // fprintf(plot,"\n  yaw angle, %5.2f , yaw desired direction, %5.2f , yaw gyro delta, %5.2f , motor 0 , %d, motor 1, %d , motor2 , %d, motor 3, %d ",  yaw_gyro, des_yaw_joy, yaw_gyro_delta,motor0_pwm,motor1_pwm,motor2_pwm,motor3_pwm);
+
 
         }
 
