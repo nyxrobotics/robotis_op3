@@ -161,8 +161,8 @@ void dxlCurrentCollector()
     
     std::string joint_name = it.first;
     Dynamixel *dxl = it.second;
-    ROS_INFO(it.first);
-    controller->read4Byte(it.first,132,&data32);
+    ROS_INFO(joint_name);
+    controller->read4Byte(joint_name,126,&data32);
     current_msg.data.push_back(data32);
     // current_msg[dxl_index] = data32; 
     // dxl_index ++;

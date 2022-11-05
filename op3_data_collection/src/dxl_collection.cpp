@@ -34,7 +34,7 @@ class Collection
         Collection(){
             ros::NodeHandle nh;
             ROS_INFO("current_collection->init");
-            controller_.getInstance();
+            // controller_.getInstance();
             RobotisController *controller = RobotisController::getInstance();
 
 
@@ -114,7 +114,7 @@ class Collection
         int rate;
         Robot *robot_;
         uint8_t *error;
-        robotis_framework::RobotisController controller_;
+        robotis_framework::RobotisController controller;
 
 };
 
