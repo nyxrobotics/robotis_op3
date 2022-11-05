@@ -72,6 +72,7 @@ class Collection
             ROS_INFO("get current");
             uint32_t robot_currents;
             // robot_currents.resize(12);
+            uint32_t read_data;
             for (auto& it : controller->robot_->dxls_)
             {
                 std::string joint_name = it.first;
