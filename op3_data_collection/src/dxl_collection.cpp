@@ -70,7 +70,7 @@ class Collection
         void get_current()
         {
             ROS_INFO("get current");
-            uint16_t robot_currents;
+            uint32_t robot_currents;
             // robot_currents.resize(12);
             for (auto& it : controller->robot_->dxls_)
             {
@@ -85,7 +85,7 @@ class Collection
                 if (result == COMM_SUCCESS)
                 {
                     robot_currents=read_data;
-                    ROS_INFO("current reading %f",robot_currents);
+                    // ROS_INFO("current reading %f",robot_currents);
                 }
                     
 
