@@ -35,6 +35,7 @@ class Collection
             ros::NodeHandle nh;
             ROS_INFO("current_collection->init");
             controller_.getInstance();
+            RobotisController *controller = RobotisController::getInstance();
 
 
             // _current_pub = nh.advertise<std::vector<double>>("/collection/currents", 0,this);
@@ -55,7 +56,7 @@ class Collection
             // ROS_INFO(dev_desc_dir_path);
 
             // *robot_ = Robot(robot_file_path, dev_desc_dir_path);
-            controller_.initialize(robot_file_, init_file_);
+            // controller.initialize(robot_file_, init_file_);
             
             // *robot_ = Robot(robot_file_, dev_desc_dir_path);
 
@@ -69,22 +70,22 @@ class Collection
         void get_current()
         {
             ROS_INFO("get current");
-            std::vector<double> robot_currents;
-            robot_currents.resize(12);
-            for (auto& it : robot_->dxls_)
+            uint16_t robot_currents;
+            // robot_currents.resize(12);
+            for (auto& it : controller->robot_->dxls_)
             {
                 std::string joint_name = it.first;
                 Dynamixel *dxl = it.second;
             
                 dynamixel::PacketHandler *pkt_handler   = dynamixel::PacketHandler::getPacketHandler(dxl->protocol_version_);
-                dynamixel::PortHandler   *port_handler  = robot_->ports_[dxl->port_name_];
+                dynamixel::PortHandler   *port_handler  = controller->robot_->ports_[dxl->port_name_];
                 uint32_t read_data = 0;
                 // int result = pkt_handler->read4ByteTxRx(port_handler, dxl->id_, item->address_, &read_data, error);
-                int result = pkt_handler->read4ByteTxRx(port_handler, dxl->id_, 126, &read_data, error);
+                int result = pkt_handler->read2ByteTxRx(port_handler, dxl->id_, 126, &read_data, error);
                 if (result == COMM_SUCCESS)
                 {
-                    robot_currents[0]=read_data;
-                    ROS_INFO("current reading %f",robot_currents[0]);
+                    robot_currents=read_data;
+                    ROS_INFO("current reading %f",robot_currents);
                 }
                     
 
