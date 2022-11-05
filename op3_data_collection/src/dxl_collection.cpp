@@ -35,7 +35,6 @@ class Collection
             ros::NodeHandle nh;
             ROS_INFO("current_collection->init");
             // controller_.getInstance();
-            RobotisController *controller = RobotisController::getInstance();
 
 
             // _current_pub = nh.advertise<std::vector<double>>("/collection/currents", 0,this);
@@ -69,6 +68,8 @@ class Collection
     
         void get_current()
         {
+            RobotisController *controller = RobotisController::getInstance();
+
             ROS_INFO("get current");
             uint32_t robot_currents;
             // robot_currents.resize(12);
