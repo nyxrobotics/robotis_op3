@@ -59,7 +59,7 @@ class Collection
             // ROS_INFO(dev_desc_dir_path);
 
             // *robot_ = Robot(robot_file_path, dev_desc_dir_path);
-            // controller.initialize(robot_file_, init_file_);
+            // controller_.initialize(robot_file_, init_file_);
             
             // *robot_ = Robot(robot_file_, dev_desc_dir_path);
 
@@ -72,22 +72,22 @@ class Collection
     
         // void get_current()
         // {
-        //     RobotisController *controller = RobotisController::getInstance();
+        //     RobotisController *controller_ = RobotisController::getInstance();
 
         //     ROS_INFO("get current");
-        //     controller->startTimer();
+        //     controller_->startTimer();
         //     uint32_t robot_currents;
         //     // robot_currents.resize(12);
         //     uint32_t read_data;
-        //     for (auto& it : controller->robot_->dxls_)
+        //     for (auto& it : controller_->robot_->dxls_)
         //     {
         //         std::string joint_name = it.first;
         //         Dynamixel *dxl = it.second;
             
         //         // dynamixel::PacketHandler *pkt_handler   = dynamixel::PacketHandler::getPacketHandler(dxl->protocol_version_);
-        //         // dynamixel::PortHandler   *port_handler  = controller->robot_->ports_[dxl->port_name_];
+        //         // dynamixel::PortHandler   *port_handler  = controller_->robot_->ports_[dxl->port_name_];
         //         uint32_t data32 = 0;
-        //         int result=controller->readCtrlItem(joint_name,"present_current",&data32);
+        //         int result=controller_->readCtrlItem(joint_name,"present_current",&data32);
         //         switch (result){
         //         case COMM_PORT_BUSY:
         //             ROS_INFO("Commport busy");
@@ -112,18 +112,18 @@ class Collection
                     
 
         //     }
-        //     controller->stopTimer();
+        //     controller_->stopTimer();
 
 
         // }
 
         void dxlCurrentCollector()
         {
-            ROS_INFO("Starting robot controller");
-            RobotisController *controller = RobotisController::getInstance();
-            ROS_INFO("Started robot controller");
+            ROS_INFO("Starting robot controller_");
+            RobotisController *controller_ = RobotisController::getInstance();
+            ROS_INFO("Started robot controller_");
 
-            // current_msg.resize(controller->robot_->dxls_.size());
+            // current_msg.resize(controller_->robot_->dxls_.size());
             uint8_t  data8 = 0;
             uint16_t  data16 = 0;
             uint32_t  data32 = 0;
@@ -131,20 +131,22 @@ class Collection
             // int dxl_index = 0;
             current_msg.data.clear();
             int result = COMM_NOT_AVAILABLE;
-            controller->startTimer();
+            ROS_INFO("starting timer");
+            controller_->startTimer();
+            ROS_INFO("started timer");
 
-            for (auto& it : controller->robot_->dxls_)
+            for (auto& it : controller_->robot_->dxls_)
             {
-                // ROS_INFO("Current for loop");
+                ROS_INFO("Current for loop");
                 
                 std::string joint_name = it.first;
                 Dynamixel *dxl = it.second;
                 // ControlTableItem *item = dxl->ctrl_table_["present_position"];
-                // ROsult = controller->read4Byte(joint_name,item->address_,&data32);
+                // ROsult = controller_->read4Byte(joint_name,item->address_,&data32);
                 // if (result == COMM_SUCCESS){
                 //   ROS_INFO("Successful commm"); 
                 // }
-                result=controller->readCtrlItem(joint_name,"present_current",&data32);
+                result=controller_->readCtrlItem(joint_name,"present_current",&data32);
                 switch (result){
                 case COMM_PORT_BUSY:
                     ROS_INFO("Commport busy");
@@ -168,8 +170,9 @@ class Collection
                 // current_msg[dxl_index] = data32; 
                 // dxl_index ++;
                 // ROS_INFO("joint "+it.first+" has current of %i", data32);
-                controller->stopTimer();
             }
+            // controller_->stopTimer();
+
             // dxl_index = 0;
 
             _current_pub.publish(current_msg);
@@ -200,7 +203,7 @@ class Collection
         int rate;
         Robot *robot_;
         uint8_t *error;
-        robotis_framework::RobotisController controller;
+        robotis_framework::RobotisController controller_;
 
 };
 
@@ -224,8 +227,8 @@ int main(int argc, char **argv)
 // //   g_init_pose_pub = nh.advertise<std_msgs::String>("/robotis/base/ini_pose", 0);
 // //   g_demo_command_pub = nh.advertise<std_msgs::String>("/ball_tracker/command", 0);
 
-// //   nh.param<bool>("gazebo", controller->gazebo_mode_, false);
-// //   g_is_simulation = controller->gazebo_mode_;
+// //   nh.param<bool>("gazebo", controller_->gazebo_mode_, false);
+// //   g_is_simulation = controller_->gazebo_mode_;
 
 //   /* real robot */
 //   if (g_is_simulation == false)

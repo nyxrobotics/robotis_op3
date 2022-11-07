@@ -147,87 +147,72 @@ void dxlTorqueCheckCallback(const std_msgs::String::ConstPtr& msg)
   }
 }
 
-// void dxlCurrentCollector()
-// {
+void dxlCurrentCollector()
+{
   
-//   RobotisController *controller = RobotisController::getInstance();
+  RobotisController *controller = RobotisController::getInstance();
 
-//   // current_msg.resize(controller->robot_->dxls_.size());
-//   uint8_t  data8 = 0;
-//   uint16_t  data16 = 0;
-//   uint32_t  data32 = 0;
-//   // uint8_t addy = 100;
-//   // int dxl_index = 0;
-//   current_msg.data.clear();
-//   int result = COMM_NOT_AVAILABLE;
-//   controller->startTimer();
+  // current_msg.resize(controller->robot_->dxls_.size());
+  uint8_t  data8 = 0;
+  uint16_t  data16 = 0;
+  uint32_t  data32 = 0;
+  // uint8_t addy = 100;
+  // int dxl_index = 0;
+  current_msg.data.clear();
+  int result = COMM_NOT_AVAILABLE;
+  controller->startTimer();
 
-//   for (auto& it : controller->robot_->dxls_)
-//   {
-//     // ROS_INFO("Current for loop");
+  for (auto& it : controller->robot_->dxls_)
+  {
+    // ROS_INFO("Current for loop");
     
-//     std::string joint_name = it.first;
-//     Dynamixel *dxl = it.second;
-//     ControlTableItem *item = dxl->ctrl_table_["present_position"];
-//     // ROS_INFO("    %u",  item->address_);
-//     // ROS_INFO(typeid(item->address_).name().c_str());
-//     // ROS_INFO(joint_name);
-//     // result = controller->read1Byte(joint_name,item->address_,&data8);
-//     // if (result == COMM_SUCCESS){
-//     //   ROS_INFO("Successful commm"); 
-//     // }
-//     // result = controller->read2Byte(joint_name,item->address_,&data16);
-//     // if (result == COMM_SUCCESS){
-//     //   ROS_INFO("Successful commm"); 
-//     // }
-//     // result = controller->read4Byte(joint_name,item->address_,&data32);
-//     // if (result == COMM_SUCCESS){
-//     //   ROS_INFO("Successful commm"); 
-//     // }
-//     result=controller->readCtrlItem(joint_name,"present_current",&data32);
-//     switch (result){
-//       case COMM_PORT_BUSY:
-//         ROS_INFO("Commport busy");
-//         break;
-//       case COMM_NOT_AVAILABLE:
-//         ROS_INFO("com not available");
-//         break;
-//       case COMM_SUCCESS:
-//         ROS_INFO("comm success");
-//         break;
-//       default:
-//         ROS_INFO("comm none");
-//         break;
-//     }
+    std::string joint_name = it.first;
+    Dynamixel *dxl = it.second;
 
-//     // if (result == COMM_SUCCESS){
-//     //   ROS_INFO("Successful commm"); 
-//     // }
-//     ROS_INFO("%u",data32);
-//     current_msg.data.push_back(data32);
-//     // current_msg[dxl_index] = data32; 
-//     // dxl_index ++;
-//     // ROS_INFO("joint "+it.first+" has current of %i", data32);
-//     controller->stopTimer();
-//   }
-//   // dxl_index = 0;
+    result=controller->readCtrlItem(joint_name,"present_current",&data32);
+    switch (result){
+      case COMM_PORT_BUSY:
+        ROS_INFO("Commport busy");
+        break;
+      case COMM_NOT_AVAILABLE:
+        ROS_INFO("com not available");
+        break;
+      case COMM_SUCCESS:
+        ROS_INFO("comm success");
+        break;
+      default:
+        ROS_INFO("comm none");
+        break;
+    }
 
-//   _current_pub.publish(current_msg);
-//   ROS_INFO("Current published");
+    // if (result == COMM_SUCCESS){
+    //   ROS_INFO("Successful commm"); 
+    // }
+    ROS_INFO("%u",data32);
+    current_msg.data.push_back(data32);
+    // current_msg[dxl_index] = data32; 
+    // dxl_index ++;
+    // ROS_INFO("joint "+it.first+" has current of %i", data32);
+    controller->stopTimer();
+  }
+  // dxl_index = 0;
+
+  _current_pub.publish(current_msg);
+  ROS_INFO("Current published");
 
 
-// }
+}
 
-// void dxlCurrentCollector_loop()
-// {
-//   int rate = 5;
-//   ros::Rate r(rate);
-//   while(ros::ok){
-//     dxlCurrentCollector();
-//     r.sleep();
+void dxlCurrentCollector_loop()
+{
+  int rate = 1;
+  ros::Rate r(rate);
+  while(ros::ok){
+    dxlCurrentCollector();
+    r.sleep();
 
-//   }
-// }
+  }
+}
 
 int main(int argc, char **argv)
 {
@@ -349,13 +334,14 @@ int main(int argc, char **argv)
 
   g_init_pose_pub.publish(init_msg);
   ROS_INFO("Go to init pose");
+  // if (g_is_simulation == false)
+  //   {  
+  //     dxlCurrentCollector_loop();
+  //   }
 
   while (ros::ok())
   {
-    // if (g_is_simulation == false)
-    // {  
-    //   // dxlCurrentCollector_loop();
-    // }
+    
     usleep(1 * 1000);
 
     ros::spin();
