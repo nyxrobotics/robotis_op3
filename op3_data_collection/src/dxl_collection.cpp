@@ -3,6 +3,8 @@
 #include <ros/package.h>
 #include <ros/callback_queue.h>
 #include "robotis_controller/robotis_controller.h"
+#include "std_msgs/UInt32MultiArray.h"
+
 
 
 using namespace robotis_framework;
@@ -44,6 +46,8 @@ class Collection
             
             nh.param<std::string>("robot_file_path", robot_file_, "");
             nh.param<std::string>("init_file_path", init_file_, "");
+            _current_pub = nh.advertise<std_msgs::UInt32MultiArray>("/collection/dxl_currents",0);
+
 
             std::string dev_desc_dir_path = ros::package::getPath("robotis_device") + "/devices";
             ROS_INFO("dir path");
@@ -66,42 +70,121 @@ class Collection
 
         }
     
-        void get_current()
-        {
-            RobotisController *controller = RobotisController::getInstance();
+        // void get_current()
+        // {
+        //     RobotisController *controller = RobotisController::getInstance();
 
-            ROS_INFO("get current");
-            uint32_t robot_currents;
-            // robot_currents.resize(12);
-            uint32_t read_data;
-            for (auto& it : controller->robot_->dxls_)
-            {
-                std::string joint_name = it.first;
-                Dynamixel *dxl = it.second;
+        //     ROS_INFO("get current");
+        //     controller->startTimer();
+        //     uint32_t robot_currents;
+        //     // robot_currents.resize(12);
+        //     uint32_t read_data;
+        //     for (auto& it : controller->robot_->dxls_)
+        //     {
+        //         std::string joint_name = it.first;
+        //         Dynamixel *dxl = it.second;
             
-                dynamixel::PacketHandler *pkt_handler   = dynamixel::PacketHandler::getPacketHandler(dxl->protocol_version_);
-                dynamixel::PortHandler   *port_handler  = controller->robot_->ports_[dxl->port_name_];
-                uint32_t read_data = 0;
-                // int result = pkt_handler->read4ByteTxRx(port_handler, dxl->id_, item->address_, &read_data, error);
-                int result = pkt_handler->read2ByteTxRx(port_handler, dxl->id_, 126, &read_data, error);
-                if (result == COMM_SUCCESS)
-                {
-                    robot_currents=read_data;
-                    // ROS_INFO("current reading %f",robot_currents);
-                }
+        //         // dynamixel::PacketHandler *pkt_handler   = dynamixel::PacketHandler::getPacketHandler(dxl->protocol_version_);
+        //         // dynamixel::PortHandler   *port_handler  = controller->robot_->ports_[dxl->port_name_];
+        //         uint32_t data32 = 0;
+        //         int result=controller->readCtrlItem(joint_name,"present_current",&data32);
+        //         switch (result){
+        //         case COMM_PORT_BUSY:
+        //             ROS_INFO("Commport busy");
+        //             break;
+        //         case COMM_NOT_AVAILABLE:
+        //             ROS_INFO("com not available");
+        //             break;
+        //         case COMM_SUCCESS:
+        //             ROS_INFO("comm success");
+        //             break;
+        //         default:
+        //             ROS_INFO("comm none");
+        //             break;
+        //         }
+        //         // int result = pkt_handler->read4ByteTxRx(port_handler, dxl->id_, item->address_, &read_data, error);
+        //         // int result = pkt_handler->read2ByteTxRx(port_handler, dxl->id_, 126, &read_data, error);
+        //         // if (result == COMM_SUCCESS)
+        //         // {
+        //         //     robot_currents=read_data;
+        //         //     // ROS_INFO("current reading %f",robot_currents);
+        //         // }
                     
 
+        //     }
+        //     controller->stopTimer();
+
+
+        // }
+
+        void dxlCurrentCollector()
+        {
+            ROS_INFO("Starting robot controller");
+            RobotisController *controller = RobotisController::getInstance();
+            ROS_INFO("Started robot controller");
+
+            // current_msg.resize(controller->robot_->dxls_.size());
+            uint8_t  data8 = 0;
+            uint16_t  data16 = 0;
+            uint32_t  data32 = 0;
+            // uint8_t addy = 100;
+            // int dxl_index = 0;
+            current_msg.data.clear();
+            int result = COMM_NOT_AVAILABLE;
+            controller->startTimer();
+
+            for (auto& it : controller->robot_->dxls_)
+            {
+                // ROS_INFO("Current for loop");
+                
+                std::string joint_name = it.first;
+                Dynamixel *dxl = it.second;
+                // ControlTableItem *item = dxl->ctrl_table_["present_position"];
+                // ROsult = controller->read4Byte(joint_name,item->address_,&data32);
+                // if (result == COMM_SUCCESS){
+                //   ROS_INFO("Successful commm"); 
+                // }
+                result=controller->readCtrlItem(joint_name,"present_current",&data32);
+                switch (result){
+                case COMM_PORT_BUSY:
+                    ROS_INFO("Commport busy");
+                    break;
+                case COMM_NOT_AVAILABLE:
+                    ROS_INFO("com not available");
+                    break;
+                case COMM_SUCCESS:
+                    ROS_INFO("comm success");
+                    break;
+                default:
+                    ROS_INFO("comm none");
+                    break;
+                }
+
+                // if (result == COMM_SUCCESS){
+                //   ROS_INFO("Successful commm"); 
+                // }
+                // ROS_INFO("%u",data32);
+                current_msg.data.push_back(data32);
+                // current_msg[dxl_index] = data32; 
+                // dxl_index ++;
+                // ROS_INFO("joint "+it.first+" has current of %i", data32);
+                controller->stopTimer();
             }
+            // dxl_index = 0;
+
+            _current_pub.publish(current_msg);
+            ROS_INFO("Current published");
 
 
         }
+    
 
         void while_func(){
-            rate = 1;
+            rate = 5;
             ros::Rate r(rate);
             ROS_INFO("Entering while function");
             while(ros::ok){
-                get_current();
+                dxlCurrentCollector();
                 // ros::spinOnce();
                 r.sleep();
             }
@@ -113,6 +196,7 @@ class Collection
         ros::Publisher _current_pub;
         std::string robot_file_ = "";
         std::string init_file_ = "";
+        std_msgs::UInt32MultiArray current_msg;
         int rate;
         Robot *robot_;
         uint8_t *error;
