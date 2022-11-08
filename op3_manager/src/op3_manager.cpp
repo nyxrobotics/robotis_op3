@@ -197,11 +197,14 @@ void dxlCurrentCollector(std_msgs::UInt32MultiArray trigger)
     // dxl_index ++;
     // ROS_INFO("joint "+it.first+" has current of %i", data32);
     controller->stopTimer();
+
+    
   }
   // dxl_index = 0;
 
   _current_pub.publish(current_msg);
   ROS_INFO("Current published");
+  // controller->stopTimer();
 
 
 }

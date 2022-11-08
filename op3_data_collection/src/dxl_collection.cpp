@@ -194,7 +194,7 @@ class Collection
     
 
         void while_func(){
-            rate = 5;
+            rate = 1;
             ros::Rate r(rate);
             ROS_INFO("Entering while function");
             while(ros::ok){
