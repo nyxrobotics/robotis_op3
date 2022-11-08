@@ -239,7 +239,7 @@ int main(int argc, char **argv)
   g_demo_command_pub = nh.advertise<std_msgs::String>("/ball_tracker/command", 0);
 
   _current_pub = nh.advertise<std_msgs::UInt32MultiArray>("/collection/dxl_currents",0);
-  _current_sub = nh.subscribe("collection/current_trigger",1,dxlCurrentCollector);
+  _current_sub = nh.subscribe("collection/current_trigger",0,dxlCurrentCollector);
 
   nh.param<bool>("gazebo", controller->gazebo_mode_, false);
   g_is_simulation = controller->gazebo_mode_;
