@@ -5,6 +5,8 @@
 #include "robotis_controller/robotis_controller.h"
 #include "std_msgs/UInt32MultiArray.h"
 
+#include "std_msgs/Bool.h"
+
 
 
 using namespace robotis_framework;
@@ -46,8 +48,9 @@ class Collection
             
             nh.param<std::string>("robot_file_path", robot_file_, "");
             nh.param<std::string>("init_file_path", init_file_, "");
-            _current_pub = nh.advertise<bool>("/collection/current_trigger",0);
-            _current_sub = nh.Subscriber<std_msgs::UInt32MultiArray>("/collection/dxl_currents",1,current_callback);
+            // _current_pub = nh.advertise<std_msgs::bool>("/collection/current_trigger",0);
+            _current_pub = nh.advertise<std_msgs::UInt32MultiArray>("/collection/current_trigger",0);
+            _current_sub = nh.subscribe("/collection/dxl_currents",1,&Collection::current_callback,this);
 
 
 
@@ -118,7 +121,7 @@ class Collection
 
 
         // }
-        void current_callback(data){
+        void current_callback(std_msgs::UInt32MultiArray data){
             ROS_INFO("data recieved");
             fprintf(plot,"\n  1, %u , 2, %u , 3, %u , 4 , %u, 5, %u ,6 , %u, 7, %u , 8, %u , 9, %u, 10, %u, 11, %u , 12, %u ",  data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], data.data[8], data.data[9], data.data[10], data.data[11]);
             ROS_INFO("\n plotted 1, %u , 2, %u , 3, %u , 4 , %u, 5, %u ,6 , %u, 7, %u , 8, %u , 9, %u, 10, %u, 11, %u , 12, %u ",  data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], data.data[8], data.data[9], data.data[10], data.data[11]);
@@ -183,7 +186,7 @@ class Collection
 
             // dxl_index = 0;
 
-            _current_pub.publish(current_msg);
+            // _current_pub.publish(current_msg);
             ROS_INFO("Current published");
 
 
@@ -196,6 +199,7 @@ class Collection
             ROS_INFO("Entering while function");
             while(ros::ok){
                 // dxlCurrentCollector();
+                _current_pub.publish(current_msg);
                 
                 // ros::spinOnce();
                 r.sleep();

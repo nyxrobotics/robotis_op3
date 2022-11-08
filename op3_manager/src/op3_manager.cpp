@@ -148,11 +148,11 @@ void dxlTorqueCheckCallback(const std_msgs::String::ConstPtr& msg)
   }
 }
 
-void dxlCurrentCollector(trigger)
+void dxlCurrentCollector(std_msgs::UInt32MultiArray trigger)
 {
-  if(trigger){
-    ROS_INFO("Trigger is on");
-  }
+  // if(trigger){
+  //   ROS_INFO("Trigger is on");
+  // }
   RobotisController *controller = RobotisController::getInstance();
 
   // current_msg.resize(controller->robot_->dxls_.size());
