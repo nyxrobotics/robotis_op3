@@ -65,6 +65,7 @@ ros::Publisher g_demo_command_pub;
 
 ros::Publisher _current_pub;
 std_msgs::UInt32MultiArray current_msg;
+ros::Subscriber _current_sub;
 
 void buttonHandlerCallback(const std_msgs::String::ConstPtr& msg)
 {
@@ -147,9 +148,11 @@ void dxlTorqueCheckCallback(const std_msgs::String::ConstPtr& msg)
   }
 }
 
-void dxlCurrentCollector()
+void dxlCurrentCollector(trigger)
 {
-  
+  if(trigger){
+    ROS_INFO("Trigger is on");
+  }
   RobotisController *controller = RobotisController::getInstance();
 
   // current_msg.resize(controller->robot_->dxls_.size());
@@ -203,16 +206,16 @@ void dxlCurrentCollector()
 
 }
 
-void dxlCurrentCollector_loop()
-{
-  int rate = 1;
-  ros::Rate r(rate);
-  while(ros::ok){
-    dxlCurrentCollector();
-    r.sleep();
+// void dxlCurrentCollector_loop()
+// {
+//   int rate = 1;
+//   ros::Rate r(rate);
+//   while(ros::ok){
+//     dxlCurrentCollector();
+//     r.sleep();
 
-  }
-}
+//   }
+// }
 
 int main(int argc, char **argv)
 {
@@ -236,6 +239,7 @@ int main(int argc, char **argv)
   g_demo_command_pub = nh.advertise<std_msgs::String>("/ball_tracker/command", 0);
 
   _current_pub = nh.advertise<std_msgs::UInt32MultiArray>("/collection/dxl_currents",0);
+  _current_sub = nh.subscribe("collection/current_trigger",1,dxlCurrentCollector);
 
   nh.param<bool>("gazebo", controller->gazebo_mode_, false);
   g_is_simulation = controller->gazebo_mode_;

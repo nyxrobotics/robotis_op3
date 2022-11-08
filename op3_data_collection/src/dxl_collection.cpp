@@ -46,7 +46,9 @@ class Collection
             
             nh.param<std::string>("robot_file_path", robot_file_, "");
             nh.param<std::string>("init_file_path", init_file_, "");
-            _current_pub = nh.advertise<std_msgs::UInt32MultiArray>("/collection/dxl_currents",0);
+            _current_pub = nh.advertise<bool>("/collection/current_trigger",0);
+            _current_sub = nh.Subscriber<std_msgs::UInt32MultiArray>("/collection/dxl_currents",1,current_callback);
+
 
 
             std::string dev_desc_dir_path = ros::package::getPath("robotis_device") + "/devices";
@@ -116,6 +118,12 @@ class Collection
 
 
         // }
+        void current_callback(data){
+            ROS_INFO("data recieved");
+            fprintf(plot,"\n  1, %u , 2, %u , 3, %u , 4 , %u, 5, %u ,6 , %u, 7, %u , 8, %u , 9, %u, 10, %u, 11, %u , 12, %u ",  data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], data.data[8], data.data[9], data.data[10], data.data[11]);
+            ROS_INFO("\n plotted 1, %u , 2, %u , 3, %u , 4 , %u, 5, %u ,6 , %u, 7, %u , 8, %u , 9, %u, 10, %u, 11, %u , 12, %u ",  data.data[0], data.data[1], data.data[2], data.data[3], data.data[4], data.data[5], data.data[6], data.data[7], data.data[8], data.data[9], data.data[10], data.data[11]);
+
+        }
 
         void dxlCurrentCollector()
         {
@@ -187,21 +195,23 @@ class Collection
             ros::Rate r(rate);
             ROS_INFO("Entering while function");
             while(ros::ok){
-                dxlCurrentCollector();
+                // dxlCurrentCollector();
+                
                 // ros::spinOnce();
                 r.sleep();
             }
         }
 
     private:
-        ros::Publisher g_init_pose_pub;
-        ros::Publisher g_demo_command_pub;
+        // ros::Publisher g_init_pose_pub;
+        // ros::Publisher g_demo_command_pub;
         ros::Publisher _current_pub;
+        ros::Subscriber _current_sub;
         std::string robot_file_ = "";
         std::string init_file_ = "";
         std_msgs::UInt32MultiArray current_msg;
         int rate;
-        Robot *robot_;
+        // Robot *robot_;
         uint8_t *error;
         robotis_framework::RobotisController controller_;
 
