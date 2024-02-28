@@ -1,4 +1,7 @@
-- git: {local-name: robotis_op3_msgs, uri: 'https://github.com/ROBOTIS-GIT/ROBOTIS-OP3-msgs.git', version: master}
-- git: {local-name: robotis_framework, uri: 'https://github.com/ROBOTIS-GIT/ROBOTIS-Framework.git', version: master}
-- git: {local-name: robotis_controller_msgs , uri: 'https://github.com/ROBOTIS-GIT/ROBOTIS-Framework-msgs.git', version: master}
-- git: {local-name: robotis_math , uri: 'git@github.com:ROBOTIS-GIT/ROBOTIS-Math.git', version: master}
+- git: {local-name: robotis_op3_msgs, uri: 'git@github.com:ROBOTIS-GIT/ROBOTIS-OP3-msgs.git', version: master}
+- git: {local-name: robotis_framework, uri: 'git@github.com:ROBOTIS-GIT/ROBOTIS-Framework.git', version: master}
+- git: {local-name: robotis_controller_msgs, uri: 'git@github.com:ROBOTIS-GIT/ROBOTIS-Framework-msgs.git', version: master}
+- git: {local-name: robotis_math, uri: 'git@github.com:ROBOTIS-GIT/ROBOTIS-Math.git', version: master}
+- git: {local-name: robotis_op3_common, uri: 'git@github.com:ROBOTIS-GIT/ROBOTIS-OP3-Common.git', version: master}
+- git: {local-name: robotis_op3_tools, uri: 'git@github.com:ROBOTIS-GIT/ROBOTIS-OP3-Tools.git', version: master}
+- git: {local-name: humanoid_navigation, uri: 'git@github.com:ROBOTIS-GIT/humanoid_navigation.git', version: master}

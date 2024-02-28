@@ -16,6 +16,13 @@ git clone git@github.com:ROBOTIS-GIT/ROBOTIS-OP3.git robotis_op3
 bash ./robotis_op3/vcs_install.sh
 ```
 
+## Walk on Gazebo
+```bash
+roslaunch op3_gazebo robotis_world.launch
+roslaunch op3_gui_demo op3_demo_walking.launch
+roslaunch op3_manager op3_gazebo.launch
+```
+
 ## ROBOTIS e-Manual for ROBOTIS OP3
 - [ROBOTIS e-Manual for ROBOTIS OP3](http://emanual.robotis.com/docs/en/platform/op3/introduction/)
 
