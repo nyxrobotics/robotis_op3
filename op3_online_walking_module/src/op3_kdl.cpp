@@ -53,6 +53,10 @@ void OP3Kinematics::initialize(Eigen::MatrixXd pelvis_position, Eigen::MatrixXd 
 
   // Set Kinematics Tree
 
+  // Initialize Chain
+  rleg_chain_ = KDL::Chain();
+  lleg_chain_ = KDL::Chain();
+
   // Right Leg Chain
   rleg_chain_.addSegment(KDL::Segment(
       "base", KDL::Joint(KDL::Joint::None),
@@ -171,9 +175,7 @@ void OP3Kinematics::initialize(Eigen::MatrixXd pelvis_position, Eigen::MatrixXd 
   rleg_fk_solver_ = new KDL::ChainFkSolverPos_recursive(rleg_chain_);  // forward kinematics solver
 
   // inverse kinematics solver
-  std::cout << "rleg_chain_->getNrOfJoints: " << rleg_chain_.getNrOfJoints() << std::endl;
   rleg_ik_vel_solver_ = new KDL::ChainIkSolverVel_pinv(rleg_chain_);
-
   rleg_ik_pos_solver_ = new KDL::ChainIkSolverPos_NR_JL(rleg_chain_, min_joint_position_limit, max_joint_position_limit,
                                                         *rleg_fk_solver_, *rleg_ik_vel_solver_);
 
