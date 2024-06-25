@@ -1,18 +1,18 @@
 /*******************************************************************************
-* Copyright 2017 ROBOTIS CO., LTD.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
+ * Copyright 2017 ROBOTIS CO., LTD.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 
 /* Author: Kayman */
 
@@ -63,7 +63,7 @@ void buttonHandlerCallback(const std_msgs::String::ConstPtr& msg)
 {
   if (msg->data == "user_long")
   {
-    RobotisController *controller = RobotisController::getInstance();
+    RobotisController* controller = RobotisController::getInstance();
 
     controller->setCtrlModule("none");
 
@@ -72,14 +72,14 @@ void buttonHandlerCallback(const std_msgs::String::ConstPtr& msg)
     if (g_is_simulation == false)
     {
       // power and torque on
-      PortHandler *port_handler = (PortHandler *) PortHandler::getPortHandler(g_device_name.c_str());
+      PortHandler* port_handler = (PortHandler*)PortHandler::getPortHandler(g_device_name.c_str());
       bool set_port_result = port_handler->setBaudRate(g_baudrate);
       if (set_port_result == false)
       {
         ROS_ERROR("Error Set port");
         return;
       }
-      PacketHandler *packet_handler = PacketHandler::getPacketHandler(PROTOCOL_VERSION);
+      PacketHandler* packet_handler = PacketHandler::getPacketHandler(PROTOCOL_VERSION);
 
       // check dxls torque.
       uint8_t torque = 0;
@@ -116,8 +116,8 @@ void dxlTorqueCheckCallback(const std_msgs::String::ConstPtr& msg)
   // check dxl torque
   uint8_t torque_result = 0;
   bool torque_on = true;
-  RobotisController *controller = RobotisController::getInstance();
-  //controller->robot_->port_default_device_
+  RobotisController* controller = RobotisController::getInstance();
+  // controller->robot_->port_default_device_
 
   for (std::map<std::string, std::string>::iterator map_it = controller->robot_->port_default_device_.begin();
        map_it != controller->robot_->port_default_device_.end(); map_it++)
@@ -130,7 +130,7 @@ void dxlTorqueCheckCallback(const std_msgs::String::ConstPtr& msg)
       torque_on = false;
   }
 
-  if(torque_on == false)
+  if (torque_on == false)
   {
     controller->stopTimer();
 
@@ -140,13 +140,13 @@ void dxlTorqueCheckCallback(const std_msgs::String::ConstPtr& msg)
   }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "op3_manager");
   ros::NodeHandle nh;
 
   ROS_INFO("manager->init");
-  RobotisController *controller = RobotisController::getInstance();
+  RobotisController* controller = RobotisController::getInstance();
 
   /* Load ROS Parameter */
 
@@ -168,12 +168,12 @@ int main(int argc, char **argv)
   if (g_is_simulation == false)
   {
     // open port
-    PortHandler *port_handler = (PortHandler *) PortHandler::getPortHandler(g_device_name.c_str());
+    PortHandler* port_handler = (PortHandler*)PortHandler::getPortHandler(g_device_name.c_str());
     bool set_port_result = port_handler->setBaudRate(BAUD_RATE);
     if (set_port_result == false)
       ROS_ERROR("Error Set port");
 
-    PacketHandler *packet_handler = PacketHandler::getPacketHandler(PROTOCOL_VERSION);
+    PacketHandler* packet_handler = PacketHandler::getPacketHandler(PROTOCOL_VERSION);
 
     // power on dxls
     int torque_on_count = 0;
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
     {
       int _return = packet_handler->write1ByteTxRx(port_handler, SUB_CONTROLLER_ID, POWER_CTRL_TABLE, 1);
 
-      if(_return != 0)
+      if (_return != 0)
         ROS_ERROR("Torque on DXLs! [%s]", packet_handler->getRxPacketError(_return));
       else
         ROS_INFO("Torque on DXLs!");
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
     int led_value = led_full_unit << led_range;
     int _return = packet_handler->write2ByteTxRx(port_handler, SUB_CONTROLLER_ID, RGB_LED_CTRL_TABLE, led_value);
 
-    if(_return != 0)
+    if (_return != 0)
       ROS_ERROR("Fail to control LED [%s]", packet_handler->getRxPacketError(_return));
 
     port_handler->closePort();
@@ -236,16 +236,16 @@ int main(int argc, char **argv)
   usleep(300 * 1000);
 
   /* Add Sensor Module */
-  controller->addSensorModule((SensorModule*) OpenCRModule::getInstance());
+  controller->addSensorModule((SensorModule*)OpenCRModule::getInstance());
 
   /* Add Motion Module */
-  controller->addMotionModule((MotionModule*) ActionModule::getInstance());
-  controller->addMotionModule((MotionModule*) BaseModule::getInstance());
-  controller->addMotionModule((MotionModule*) HeadControlModule::getInstance());
-  controller->addMotionModule((MotionModule*) WalkingModule::getInstance());
-  controller->addMotionModule((MotionModule*) DirectControlModule::getInstance());
-  controller->addMotionModule((MotionModule*) OnlineWalkingModule::getInstance());
-  controller->addMotionModule((MotionModule*) TuningModule::getInstance());
+  controller->addMotionModule((MotionModule*)ActionModule::getInstance());
+  controller->addMotionModule((MotionModule*)BaseModule::getInstance());
+  controller->addMotionModule((MotionModule*)HeadControlModule::getInstance());
+  controller->addMotionModule((MotionModule*)WalkingModule::getInstance());
+  controller->addMotionModule((MotionModule*)DirectControlModule::getInstance());
+  controller->addMotionModule((MotionModule*)OnlineWalkingModule::getInstance());
+  controller->addMotionModule((MotionModule*)TuningModule::getInstance());
 
   // start timer
   controller->startTimer();
