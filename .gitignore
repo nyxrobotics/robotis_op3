@@ -11,3 +11,5 @@ qtcreator-build
 *.autosave
 /op3_manager/config/offset.yaml
 .vs
+.vscode/
+op3_online_walking_module/.cache
