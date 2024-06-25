@@ -12,7 +12,4 @@
   <node pkg="op3_manager" type="op3_manager" name="op3_manager" output="screen">
     <param name="angle_unit" value="30"/>
   </node>
-
-  <!-- OP3 Localization -->
-  <node pkg="op3_localization" type="op3_localization" name="op3_localization" output="screen"/>
 </launch>

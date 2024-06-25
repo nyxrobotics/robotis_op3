@@ -9,5 +9,7 @@
   <param name="device_name" value="/dev/ttyUSB0"/>
 
   <!-- OP3 Manager -->
-  <node pkg="op3_manager" type="op3_manager" name="op3_manager" output="screen"/>
+  <node pkg="op3_manager" type="op3_manager" name="op3_manager" output="screen">
+    <param name="gazebo" value="true"/>
+  </node>
 </launch>

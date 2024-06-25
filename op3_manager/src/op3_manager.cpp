@@ -236,7 +236,10 @@ int main(int argc, char** argv)
   usleep(300 * 1000);
 
   /* Add Sensor Module */
-  controller->addSensorModule((SensorModule*)OpenCRModule::getInstance());
+  if (g_is_simulation == false)
+  {
+    controller->addSensorModule((SensorModule*)OpenCRModule::getInstance());
+  }
 
   /* Add Motion Module */
   controller->addMotionModule((MotionModule*)ActionModule::getInstance());
