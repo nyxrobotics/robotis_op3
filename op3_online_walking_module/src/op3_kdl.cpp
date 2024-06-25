@@ -54,88 +54,91 @@ void OP3Kinematics::initialize(Eigen::MatrixXd pelvis_position, Eigen::MatrixXd 
   // Set Kinematics Tree
 
   // Right Leg Chain
-  rleg_chain.addSegment(KDL::Segment(
+  rleg_chain_.addSegment(KDL::Segment(
       "base", KDL::Joint(KDL::Joint::None),
       KDL::Frame(KDL::Rotation(pelvis_Xx, pelvis_Yx, pelvis_Zx, pelvis_Xy, pelvis_Yy, pelvis_Zy, pelvis_Xz, pelvis_Yz,
                                pelvis_Zz),
                  KDL::Vector(pelvis_x, pelvis_y, pelvis_z)),
       KDL::RigidBodyInertia(0.0, KDL::Vector(0.0, 0.0, 0.0), KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  rleg_chain.addSegment(
-      KDL::Segment("pelvis", KDL::Joint(KDL::Joint::None), KDL::Frame(KDL::Vector(0.0, -0.035, -0.0907)),
-                   //                                     KDL::Frame(KDL::Vector(-0.005, -0.035, -0.0907)),
-                   KDL::RigidBodyInertia(0.72235, KDL::Vector(0.0, 0.0, 0.0),
-                                         KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  rleg_chain.addSegment(KDL::Segment(
+  rleg_chain_.addSegment(KDL::Segment("pelvis", KDL::Joint(KDL::Joint::None),
+                                      KDL::Frame(KDL::Vector(0.0, -0.035, -0.0907)),
+                                      //                                     KDL::Frame(KDL::Vector(-0.005,
+                                      //                                     -0.035, -0.0907)),
+                                      KDL::RigidBodyInertia(0.72235, KDL::Vector(0.0, 0.0, 0.0),
+                                                            KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
+  rleg_chain_.addSegment(KDL::Segment(
       "r_hip_yaw", KDL::Joint("minus_RotZ", KDL::Vector(0, 0, 0), KDL::Vector(0, 0, -1), KDL::Joint::RotAxis),
       KDL::Frame(KDL::Vector(0.000, 0.000, -0.0285)),
       KDL::RigidBodyInertia(0.01181, KDL::Vector(0.0, 0.0, 0.0),
                             KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  rleg_chain.addSegment(KDL::Segment(
+  rleg_chain_.addSegment(KDL::Segment(
       "r_leg_hip_r", KDL::Joint("minus_RotX", KDL::Vector(0, 0, 0), KDL::Vector(-1, 0, 0), KDL::Joint::RotAxis),
       KDL::Frame(KDL::Vector(0.0, 0.0, 0.0)),
       KDL::RigidBodyInertia(0.17886, KDL::Vector(0.0, 0.0, 0.0),
                             KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  rleg_chain.addSegment(KDL::Segment(
+  rleg_chain_.addSegment(KDL::Segment(
       "r_leg_hip_p", KDL::Joint("minus_RotY", KDL::Vector(0, 0, 0), KDL::Vector(0, -1, 0), KDL::Joint::RotAxis),
       KDL::Frame(KDL::Vector(0.0, 0.0, -0.11)),
       KDL::RigidBodyInertia(0.11543, KDL::Vector(0.0, 0.0, 0.0),
                             KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  rleg_chain.addSegment(KDL::Segment(
+  rleg_chain_.addSegment(KDL::Segment(
       "r_leg_kn_p", KDL::Joint("minus_RotY", KDL::Vector(0, 0, 0), KDL::Vector(0, -1, 0), KDL::Joint::RotAxis),
       KDL::Frame(KDL::Vector(0.0, 0.0, -0.11)),
       KDL::RigidBodyInertia(0.04015, KDL::Vector(0.0, 0.0, 0.0),
                             KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  rleg_chain.addSegment(KDL::Segment("r_leg_an_p", KDL::Joint(KDL::Joint::RotY), KDL::Frame(KDL::Vector(0.0, 0.0, 0.0)),
-                                     KDL::RigidBodyInertia(0.17886, KDL::Vector(0.0, 0.0, 0.0),
-                                                           KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  rleg_chain.addSegment(KDL::Segment("r_leg_an_r", KDL::Joint(KDL::Joint::RotX),
-                                     KDL::Frame(KDL::Vector(0.0, 0.0, -0.0305)),
-                                     KDL::RigidBodyInertia(0.06934, KDL::Vector(0.0, 0.0, 0.0),
-                                                           KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  rleg_chain.addSegment(KDL::Segment(
+  rleg_chain_.addSegment(KDL::Segment("r_leg_an_p", KDL::Joint(KDL::Joint::RotY),
+                                      KDL::Frame(KDL::Vector(0.0, 0.0, 0.0)),
+                                      KDL::RigidBodyInertia(0.17886, KDL::Vector(0.0, 0.0, 0.0),
+                                                            KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
+  rleg_chain_.addSegment(KDL::Segment("r_leg_an_r", KDL::Joint(KDL::Joint::RotX),
+                                      KDL::Frame(KDL::Vector(0.0, 0.0, -0.0305)),
+                                      KDL::RigidBodyInertia(0.06934, KDL::Vector(0.0, 0.0, 0.0),
+                                                            KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
+  rleg_chain_.addSegment(KDL::Segment(
       "r_leg_end", KDL::Joint(KDL::Joint::None), KDL::Frame(KDL::Vector(0.0, 0.0, 0.0)),
       KDL::RigidBodyInertia(0.0, KDL::Vector(0.0, 0.0, 0.0), KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
 
   // Left Leg Chain
-  lleg_chain.addSegment(KDL::Segment(
+  lleg_chain_.addSegment(KDL::Segment(
       "base", KDL::Joint(KDL::Joint::None),
       KDL::Frame(KDL::Rotation(pelvis_Xx, pelvis_Yx, pelvis_Zx, pelvis_Xy, pelvis_Yy, pelvis_Zy, pelvis_Xz, pelvis_Yz,
                                pelvis_Zz),
                  KDL::Vector(pelvis_x, pelvis_y, pelvis_z)),
       KDL::RigidBodyInertia(0.0, KDL::Vector(0.0, 0.0, 0.0), KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  lleg_chain.addSegment(
-      KDL::Segment("pelvis", KDL::Joint(KDL::Joint::None), KDL::Frame(KDL::Vector(0.0, 0.035, -0.0907)),
-                   //                                     KDL::Frame(KDL::Vector(-0.005, 0.035, -0.0907)),
-                   KDL::RigidBodyInertia(0.72235, KDL::Vector(0.0, 0.0, 0.0),
-                                         KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  lleg_chain.addSegment(KDL::Segment(
+  lleg_chain_.addSegment(KDL::Segment("pelvis", KDL::Joint(KDL::Joint::None),
+                                      KDL::Frame(KDL::Vector(0.0, 0.035, -0.0907)),
+                                      //                                     KDL::Frame(KDL::Vector(-0.005,
+                                      //                                     0.035, -0.0907)),
+                                      KDL::RigidBodyInertia(0.72235, KDL::Vector(0.0, 0.0, 0.0),
+                                                            KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
+  lleg_chain_.addSegment(KDL::Segment(
       "l_leg_hip_y", KDL::Joint("minus_RotZ", KDL::Vector(0, 0, 0), KDL::Vector(0, 0, -1), KDL::Joint::RotAxis),
       KDL::Frame(KDL::Vector(0.000, 0.000, -0.0285)),
       KDL::RigidBodyInertia(0.01181, KDL::Vector(0.0, 0.0, 0.0),
                             KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  lleg_chain.addSegment(KDL::Segment(
+  lleg_chain_.addSegment(KDL::Segment(
       "l_leg_hip_r", KDL::Joint("minus_RotX", KDL::Vector(0, 0, 0), KDL::Vector(-1, 0, 0), KDL::Joint::RotAxis),
       KDL::Frame(KDL::Vector(0.0, 0.0, 0.0)),
       KDL::RigidBodyInertia(0.17886, KDL::Vector(0.0, 0.0, 0.0),
                             KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  lleg_chain.addSegment(KDL::Segment("l_leg_hip_p", KDL::Joint(KDL::Joint::RotY),
-                                     KDL::Frame(KDL::Vector(0.0, 0.0, -0.11)),
-                                     KDL::RigidBodyInertia(0.11543, KDL::Vector(0.0, 0.0, 0.0),
-                                                           KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  lleg_chain.addSegment(KDL::Segment("l_leg_kn_p", KDL::Joint(KDL::Joint::RotY),
-                                     KDL::Frame(KDL::Vector(0.0, 0.0, -0.11)),
-                                     KDL::RigidBodyInertia(0.04015, KDL::Vector(0.0, 0.0, 0.0),
-                                                           KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  lleg_chain.addSegment(KDL::Segment(
+  lleg_chain_.addSegment(KDL::Segment("l_leg_hip_p", KDL::Joint(KDL::Joint::RotY),
+                                      KDL::Frame(KDL::Vector(0.0, 0.0, -0.11)),
+                                      KDL::RigidBodyInertia(0.11543, KDL::Vector(0.0, 0.0, 0.0),
+                                                            KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
+  lleg_chain_.addSegment(KDL::Segment("l_leg_kn_p", KDL::Joint(KDL::Joint::RotY),
+                                      KDL::Frame(KDL::Vector(0.0, 0.0, -0.11)),
+                                      KDL::RigidBodyInertia(0.04015, KDL::Vector(0.0, 0.0, 0.0),
+                                                            KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
+  lleg_chain_.addSegment(KDL::Segment(
       "l_leg_an_p", KDL::Joint("minus_RotY", KDL::Vector(0, 0, 0), KDL::Vector(0, -1, 0), KDL::Joint::RotAxis),
       KDL::Frame(KDL::Vector(0.0, 0.0, 0.0)),
       KDL::RigidBodyInertia(0.17886, KDL::Vector(0.0, 0.0, 0.0),
                             KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  lleg_chain.addSegment(KDL::Segment("l_leg_an_r", KDL::Joint(KDL::Joint::RotX),
-                                     KDL::Frame(KDL::Vector(0.0, 0.0, -0.0305)),
-                                     KDL::RigidBodyInertia(0.06934, KDL::Vector(0.0, 0.0, 0.0),
-                                                           KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
-  lleg_chain.addSegment(KDL::Segment(
+  lleg_chain_.addSegment(KDL::Segment("l_leg_an_r", KDL::Joint(KDL::Joint::RotX),
+                                      KDL::Frame(KDL::Vector(0.0, 0.0, -0.0305)),
+                                      KDL::RigidBodyInertia(0.06934, KDL::Vector(0.0, 0.0, 0.0),
+                                                            KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
+  lleg_chain_.addSegment(KDL::Segment(
       "l_leg_end", KDL::Joint(KDL::Joint::None), KDL::Frame(KDL::Vector(0.0, 0.0, 0.0)),
       KDL::RigidBodyInertia(0.0, KDL::Vector(0.0, 0.0, 0.0), KDL::RotationalInertia(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))));
 
@@ -162,22 +165,26 @@ void OP3Kinematics::initialize(Eigen::MatrixXd pelvis_position, Eigen::MatrixXd 
   }
 
   /* KDL Solver Initialization */
-  //  rleg_dyn_param_ = new KDL::ChainDynParam(rleg_chain_, KDL::Vector(0.0, 0.0, -9.81)); // kinematics & dynamics
-  //  parameter rleg_jacobian_solver_ = new KDL::ChainJntToJacSolver(rleg_chain__); // jabocian solver
-  rleg_fk_solver_ = new KDL::ChainFkSolverPos_recursive(rleg_chain);  // forward kinematics solver
+  //  rleg_dyn_param_ = new KDL::ChainDynParam(rleg_chain_, KDL::Vector(0.0,
+  //  0.0, -9.81)); // kinematics & dynamics parameter rleg_jacobian_solver_ =
+  //  new KDL::ChainJntToJacSolver(rleg_chain_); // jabocian solver
+  rleg_fk_solver_ = new KDL::ChainFkSolverPos_recursive(rleg_chain_);  // forward kinematics solver
 
   // inverse kinematics solver
-  rleg_ik_vel_solver_ = new KDL::ChainIkSolverVel_pinv(rleg_chain);
-  rleg_ik_pos_solver_ = new KDL::ChainIkSolverPos_NR_JL(rleg_chain, min_joint_position_limit, max_joint_position_limit,
+  std::cout << "rleg_chain_->getNrOfJoints: " << rleg_chain_.getNrOfJoints() << std::endl;
+  rleg_ik_vel_solver_ = new KDL::ChainIkSolverVel_pinv(rleg_chain_);
+
+  rleg_ik_pos_solver_ = new KDL::ChainIkSolverPos_NR_JL(rleg_chain_, min_joint_position_limit, max_joint_position_limit,
                                                         *rleg_fk_solver_, *rleg_ik_vel_solver_);
 
-  //  lleg_dyn_param_ = new KDL::ChainDynParam(lleg_chain_, KDL::Vector(0.0, 0.0, -9.81)); // kinematics & dynamics
-  //  parameter lleg_jacobian_solver_ = new KDL::ChainJntToJacSolver(lleg_chain__); // jabocian solver
-  lleg_fk_solver_ = new KDL::ChainFkSolverPos_recursive(lleg_chain);  // forward kinematics solver
+  //  lleg_dyn_param_ = new KDL::ChainDynParam(lleg_chain_, KDL::Vector(0.0,
+  //  0.0, -9.81)); // kinematics & dynamics parameter lleg_jacobian_solver_ =
+  //  new KDL::ChainJntToJacSolver(lleg_chain_); // jabocian solver
+  lleg_fk_solver_ = new KDL::ChainFkSolverPos_recursive(lleg_chain_);  // forward kinematics solver
 
   // inverse kinematics solver
-  lleg_ik_vel_solver_ = new KDL::ChainIkSolverVel_pinv(lleg_chain);
-  lleg_ik_pos_solver_ = new KDL::ChainIkSolverPos_NR_JL(lleg_chain, min_joint_position_limit, max_joint_position_limit,
+  lleg_ik_vel_solver_ = new KDL::ChainIkSolverVel_pinv(lleg_chain_);
+  lleg_ik_pos_solver_ = new KDL::ChainIkSolverPos_NR_JL(lleg_chain_, min_joint_position_limit, max_joint_position_limit,
                                                         *lleg_fk_solver_, *lleg_ik_vel_solver_);
 }
 

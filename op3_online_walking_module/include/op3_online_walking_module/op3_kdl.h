@@ -61,14 +61,14 @@ public:
   void finalize();
 
 protected:
-  //  KDL::Chain rleg_chain_;
+  KDL::Chain rleg_chain_;
   KDL::ChainDynParam* rleg_dyn_param_ = NULL;
   KDL::ChainJntToJacSolver* rleg_jacobian_solver_;
   KDL::ChainFkSolverPos_recursive* rleg_fk_solver_;
   KDL::ChainIkSolverVel_pinv* rleg_ik_vel_solver_;
   KDL::ChainIkSolverPos_NR_JL* rleg_ik_pos_solver_;
 
-  //  KDL::Chain lleg_chain_;
+  KDL::Chain lleg_chain_;
   KDL::ChainDynParam* lleg_dyn_param_ = NULL;
   KDL::ChainJntToJacSolver* lleg_jacobian_solver_;
   KDL::ChainFkSolverPos_recursive* lleg_fk_solver_;
