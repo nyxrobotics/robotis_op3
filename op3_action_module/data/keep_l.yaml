@@ -1,8 +1,9 @@
-page_number: 62
-page_name: keep_l
-repeat: 1
-step_count: 2
-joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+header:
+  page_number: 62
+  page_name: keep_l
+  repeat: 1
+  step_count: 2
+  joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
 steps:
   - step_number: 0
     positions: [0.144, -0.015, 1.198, 0.230, 0.031, -1.213, -0.293, 0.000, 2.450, -0.084, -0.410, -0.304, 1.193, -0.025, 0.327, 0.419, -0.006, -0.566, 0.083, -0.624]

@@ -1,8 +1,9 @@
-page_number: 54
-page_name: clapplz1
-repeat: 1
-step_count: 7
-joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+header:
+  page_number: 54
+  page_name: clapplz1
+  repeat: 1
+  step_count: 7
+  joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
 steps:
   - step_number: 0
     positions: [-0.084, 0.333, 0.160, -0.018, -0.474, -0.155, -0.017, -0.002, 0.242, -2.615, 0.726, -0.161, 0.017, 0.472, 0.153, 0.015, 0.000, -0.244, 2.614, -0.727]

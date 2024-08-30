@@ -1,8 +1,9 @@
-page_number: 24
-page_name: wow1
-repeat: 1
-step_count: 5
-joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+header:
+  page_number: 24
+  page_name: wow1
+  repeat: 1
+  step_count: 5
+  joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
 steps:
   - step_number: 0
     positions: [-0.158, 0.144, 0.204, -0.017, -0.327, -0.114, -0.020, -0.230, 0.235, -2.697, 0.723, -0.114, 0.015, 0.325, 0.204, 0.018, -0.232, -0.236, 2.695, -0.724]

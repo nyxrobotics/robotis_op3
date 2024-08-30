@@ -482,20 +482,25 @@ bool ActionModule::loadFile(std::string file_name)
       // YAMLファイルにモーションデータを書き出し
       YAML::Emitter out;
       out << YAML::BeginMap;
-      out << YAML::Key << "page_number" << YAML::Value << page_number;              // 小文字のスネークケース
-      out << YAML::Key << "page_name" << YAML::Value << page_name;                  // 小文字のスネークケース
-      out << YAML::Key << "repeat" << YAML::Value << (int)page.header.repeat;       // 小文字のスネークケース
-      out << YAML::Key << "step_count" << YAML::Value << (int)page.header.stepnum;  // 小文字のスネークケース
+
+      // headerセクション
+      out << YAML::Key << "header" << YAML::Value << YAML::BeginMap;
+      out << YAML::Key << "page_number" << YAML::Value << page_number;
+      out << YAML::Key << "page_name" << YAML::Value << page_name;
+      out << YAML::Key << "repeat" << YAML::Value << (int)page.header.repeat;
+      out << YAML::Key << "step_count" << YAML::Value << (int)page.header.stepnum;
 
       // joint_names の出力
-      out << YAML::Key << "joint_names" << YAML::Value << YAML::Flow << YAML::BeginSeq;  // フロースタイルに変更
+      out << YAML::Key << "joint_names" << YAML::Value << YAML::Flow << YAML::BeginSeq;
       for (const auto& it : joint_name_to_id_)
       {
         out << to_snake_case(it.first);
       }
       out << YAML::EndSeq;
+      out << YAML::EndMap;
 
-      out << YAML::Key << "steps" << YAML::Value << YAML::BeginSeq;  // 小文字のスネークケース
+      // stepsセクション
+      out << YAML::Key << "steps" << YAML::Value << YAML::BeginSeq;
       for (int step = 0; step < page.header.stepnum; ++step)
       {
         // 有効なステップのみ書き出し
@@ -514,11 +519,11 @@ bool ActionModule::loadFile(std::string file_name)
           continue;
         }
 
-        out << YAML::BeginMap;                                     // 各ステップのマップを開始
-        out << YAML::Key << "step_number" << YAML::Value << step;  // 小文字のスネークケース
+        out << YAML::BeginMap;
+        out << YAML::Key << "step_number" << YAML::Value << step;
 
         // Positionsをフロースタイルで、少数点以下3桁で表示
-        out << YAML::Key << "positions" << YAML::Value << YAML::Flow << YAML::BeginSeq;  // 小文字のスネークケース
+        out << YAML::Key << "positions" << YAML::Value << YAML::Flow << YAML::BeginSeq;
         for (const auto& it : joint_name_to_id_)
         {
           std::string joint_name = it.first;
@@ -534,8 +539,8 @@ bool ActionModule::loadFile(std::string file_name)
         }
         out << YAML::EndSeq;
 
-        out << YAML::Key << "pause" << YAML::Value << (int)page.step[step].pause;  // 小文字のスネークケース
-        out << YAML::Key << "time" << YAML::Value << (int)page.step[step].time;    // 小文字のスネークケース
+        out << YAML::Key << "pause" << YAML::Value << (int)page.step[step].pause;
+        out << YAML::Key << "time" << YAML::Value << (int)page.step[step].time;
         out << YAML::EndMap;
       }
       out << YAML::EndSeq;

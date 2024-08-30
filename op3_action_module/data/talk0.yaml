@@ -1,8 +1,9 @@
-page_number: 110
-page_name: talk0
-repeat: 1
-step_count: 2
-joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+header:
+  page_number: 110
+  page_name: talk0
+  repeat: 1
+  step_count: 2
+  joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
 steps:
   - step_number: 0
     positions: [0.149, -0.006, 0.126, -0.023, -0.790, -0.163, -0.046, -0.002, 0.232, -0.089, 0.793, -0.127, 0.021, 0.788, 0.161, 0.044, 0.000, -0.233, 0.087, -0.795]

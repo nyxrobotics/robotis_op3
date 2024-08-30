@@ -1,8 +1,9 @@
-page_number: 119
-page_name: _5
-repeat: 1
-step_count: 7
-joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+header:
+  page_number: 119
+  page_name: _5
+  repeat: 1
+  step_count: 7
+  joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
 steps:
   - step_number: 0
     positions: [-0.126, -0.072, 0.092, -0.031, -2.123, -0.173, -0.058, -0.009, 0.249, -1.034, 0.833, -0.169, 0.014, 2.286, 0.155, 0.025, -0.014, -0.275, 1.514, -0.664]
