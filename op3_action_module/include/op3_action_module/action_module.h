@@ -1,18 +1,18 @@
 /*******************************************************************************
-* Copyright 2017 ROBOTIS CO., LTD.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
+ * Copyright 2017 ROBOTIS CO., LTD.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 
 /* Authors: Kayman, Jay Song */
 
@@ -37,15 +37,14 @@
 
 namespace robotis_op
 {
-
 class ActionModule : public robotis_framework::MotionModule, public robotis_framework::Singleton<ActionModule>
 {
- public:
+public:
   ActionModule();
   virtual ~ActionModule();
 
-  void initialize(const int control_cycle_msec, robotis_framework::Robot *robot);
-  void process(std::map<std::string, robotis_framework::Dynamixel *> dxls, std::map<std::string, double> sensors);
+  void initialize(const int control_cycle_msec, robotis_framework::Robot* robot);
+  void process(std::map<std::string, robotis_framework::Dynamixel*> dxls, std::map<std::string, double> sensors);
 
   void stop();
   bool isRunning();
@@ -62,12 +61,15 @@ class ActionModule : public robotis_framework::MotionModule, public robotis_fram
 
   void brake();
   bool isRunning(int* playing_page_num, int* playing_step_num);
+  double roundTo3DecimalPlaces(double value);
+  std::string formatTo3DecimalPlaces(double value);
+  std::string to_snake_case(const std::string& str);
   bool loadPage(int page_number, action_file_define::Page* page);
   bool savePage(int page_number, action_file_define::Page* page);
   void resetPage(action_file_define::Page* page);
 
   void enableAllJoints();
-  void actionPlayProcess(std::map<std::string, robotis_framework::Dynamixel *> dxls);
+  void actionPlayProcess(std::map<std::string, robotis_framework::Dynamixel*> dxls);
 
 private:
   const int PRE_SECTION;
@@ -80,14 +82,14 @@ private:
 
   void queueThread();
 
-  bool verifyChecksum( action_file_define::Page* page );
-  void setChecksum( action_file_define::Page* page );
+  bool verifyChecksum(action_file_define::Page* page);
+  void setChecksum(action_file_define::Page* page);
 
   void publishStatusMsg(unsigned int type, std::string msg);
   void publishDoneMsg(std::string msg);
 
-  bool isRunningServiceCallback(op3_action_module_msgs::IsRunning::Request  &req,
-                                op3_action_module_msgs::IsRunning::Response &res);
+  bool isRunningServiceCallback(op3_action_module_msgs::IsRunning::Request& req,
+                                op3_action_module_msgs::IsRunning::Response& res);
 
   void pageNumberCallback(const std_msgs::Int32::ConstPtr& msg);
   void startActionCallback(const op3_action_module_msgs::StartAction::ConstPtr& msg);
@@ -97,13 +99,13 @@ private:
   std::string convertIntToString(int n);
 
   std::map<std::string, bool> action_joints_enable_;
-  std::map<std::string, robotis_framework::DynamixelState *> action_result_;
-  int             control_cycle_msec_;
-  boost::thread   queue_thread_;
+  std::map<std::string, robotis_framework::DynamixelState*> action_result_;
+  int control_cycle_msec_;
+  boost::thread queue_thread_;
 
   /* sample subscriber & publisher */
   ros::Publisher status_msg_pub_;
-  ros::Publisher  done_msg_pub_;
+  ros::Publisher done_msg_pub_;
   /////////////////////////////////////////////////////////////////////////
   std::map<std::string, int> joint_name_to_id_;
   std::map<int, std::string> joint_id_to_name_;
@@ -125,6 +127,6 @@ private:
   bool present_running_;
 };
 
-}
+}  // namespace robotis_op
 
 #endif /* OP3_ACTION_MOTION_MODULE_H_ */
