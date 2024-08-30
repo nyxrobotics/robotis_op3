@@ -1,0 +1,14 @@
+page_number: 204
+page_name: see_rightup
+repeat: 1
+step_count: 2
+joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+steps:
+  - step_number: 0
+    positions: [0.718, 0.130, 0.459, -0.026, -0.782, -0.434, -0.009, 0.005, 0.871, -0.100, 0.788, -0.471, 0.026, 0.776, 0.434, 0.020, -0.005, -0.871, 0.095, -0.799]
+    pause: 100
+    time: 100
+  - step_number: 1
+    positions: [0.020, -0.350, 0.459, -0.026, -0.782, -0.434, -0.009, 0.005, 0.871, -0.100, 0.788, -0.471, 0.026, 0.776, 0.434, 0.020, -0.005, -0.871, 0.095, -0.799]
+    pause: 0
+    time: 100

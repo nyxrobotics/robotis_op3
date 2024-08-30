@@ -1,0 +1,22 @@
+page_number: 122
+page_name: f_get_up_1
+repeat: 1
+step_count: 4
+joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+steps:
+  - step_number: 0
+    positions: [0.023, -0.348, 0.522, -0.026, -2.530, 0.253, -0.031, 0.000, 0.831, 0.126, -0.884, -0.523, 0.025, 2.528, -0.255, 0.029, -0.002, -0.833, -0.127, 0.882]
+    pause: 0
+    time: 40
+  - step_number: 1
+    positions: [0.000, 0.158, 1.758, -0.120, -2.503, -1.933, -0.032, 0.003, 1.944, -1.620, -0.597, -1.759, 0.118, 2.502, 1.931, 0.031, -0.005, -1.945, 1.618, 0.595]
+    pause: 0
+    time: 50
+  - step_number: 2
+    positions: [0.000, 0.158, 1.071, -0.120, -0.086, -1.933, -0.032, 0.003, 2.457, -0.900, 1.496, -1.072, 0.118, 0.084, 1.931, 0.031, -0.005, -2.459, 0.899, -1.497]
+    pause: 80
+    time: 80
+  - step_number: 3
+    positions: [0.023, -0.348, 0.515, -0.023, -0.787, -0.431, -0.015, 0.000, 0.836, -0.089, 0.785, -0.523, 0.025, 0.782, 0.434, 0.029, -0.002, -0.833, 0.087, -0.790]
+    pause: 0
+    time: 130

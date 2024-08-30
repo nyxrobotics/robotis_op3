@@ -1,0 +1,10 @@
+page_number: 80
+page_name: walk_ready
+repeat: 1
+step_count: 1
+joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+steps:
+  - step_number: 0
+    positions: [-0.003, -0.173, 0.491, -0.038, -0.785, -0.494, -0.037, -0.002, 0.884, -0.089, 0.787, -0.491, 0.034, 0.782, 0.491, 0.035, -0.003, -0.887, 0.089, -0.785]
+    pause: 0
+    time: 150
