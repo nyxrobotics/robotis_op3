@@ -110,7 +110,7 @@ void ActionModule::initialize(const int control_cycle_msec, robotis_framework::R
   std::string action_file_path = ros_node.param<std::string>("action_file_path", path);
 
   loadFile(action_file_path);
-  // saveYaml(action_file_path);
+  saveYaml(action_file_path);
 
   playing_ = false;
 }
@@ -585,72 +585,85 @@ bool ActionModule::loadYaml(std::string file_name)
 
 bool ActionModule::saveYaml(std::string file_name)
 {
-  // 保存先ディレクトリを取得
-#if __cplusplus >= 201703L
-  std::string directory = fs::path(file_name).parent_path().string();
-#else
-  std::string directory = fs::path(file_name).parent_path().string();
-#endif
-
-  // page_nameが空欄でないページを探索
-  for (auto& page_pair : pages_)
+  // YAMLファイルのエクスポート処理
+  for (int page_number = 0; page_number < action_file_define::MAXNUM_PAGE; ++page_number)
   {
-    const std::string& page_name = page_pair.first;
-    const action_file_define::Page& start_page = page_pair.second;
-
-    // page_nameが空欄の場合はスキップ
-    if (page_name.empty())
+    action_file_define::Page page;
+    if (loadPage(page_number, &page))
     {
-      continue;
-    }
+      std::string page_name(reinterpret_cast<char*>(page.header.name),
+                            strnlen(reinterpret_cast<char*>(page.header.name), sizeof(page.header.name)));
+      page_name.erase(std::remove(page_name.begin(), page_name.end(), '\n'), page_name.end());
+      std::replace(page_name.begin(), page_name.end(), ' ', '_');
 
-    YAML::Emitter out;
-    out << YAML::BeginMap;  // 開始のマップ
+      bool has_valid_steps = false;
+      for (int step = 0; step < page.header.stepnum; ++step)
+      {
+        for (int joint = 0; joint < action_file_define::MAXNUM_JOINTS; ++joint)
+        {
+          if (page.step[step].position[joint] != action_file_define::INVALID_BIT_MASK)
+          {
+            has_valid_steps = true;
+            break;
+          }
+        }
+        if (has_valid_steps)
+          break;
+      }
 
-    out << YAML::Key << "pages" << YAML::Value << YAML::BeginSeq;
+      if (!has_valid_steps)
+      {
+        continue;
+      }
 
-    const action_file_define::Page* current_page = &start_page;
+      std::string base_name = page_name;
+      static std::map<std::string, int> motion_file_counter;
+      if (motion_file_counter[page_name] > 0)
+      {
+        page_name += "_" + std::to_string(motion_file_counter[page_name]);
+      }
+      motion_file_counter[base_name]++;
 
-    // next や end が 0 になるまでループ
-    while (current_page != nullptr)
-    {
+      YAML::Emitter out;
       out << YAML::BeginMap;
 
       out << YAML::Key << "header" << YAML::Value << YAML::BeginMap;
-
-      // 現在のページのページ番号を取得
-      int page_number = -1;
-      for (const auto& entry : page_number_to_name_)
-      {
-        if (entry.second == page_name)
-        {
-          page_number = entry.first;
-          break;
-        }
-      }
-
       out << YAML::Key << "page_number" << YAML::Value << page_number;
       out << YAML::Key << "page_name" << YAML::Value << page_name;
-      out << YAML::Key << "repeat" << YAML::Value << (int)current_page->header.repeat;
-      out << YAML::Key << "schedule" << YAML::Value << (int)current_page->header.schedule;
-      out << YAML::Key << "step_count" << YAML::Value << (int)current_page->header.stepnum;
-      out << YAML::Key << "speed" << YAML::Value << (int)current_page->header.speed;
-      out << YAML::Key << "accel" << YAML::Value << (int)current_page->header.accel;
-      out << YAML::Key << "next" << YAML::Value << (int)current_page->header.next;
-      out << YAML::Key << "exit" << YAML::Value << (int)current_page->header.exit;
+      out << YAML::Key << "repeat" << YAML::Value << (int)page.header.repeat;
+      out << YAML::Key << "schedule" << YAML::Value << (int)page.header.schedule;
+      out << YAML::Key << "step_count" << YAML::Value << (int)page.header.stepnum;
+      out << YAML::Key << "speed" << YAML::Value << (int)page.header.speed;
+      out << YAML::Key << "accel" << YAML::Value << (int)page.header.accel;
+      out << YAML::Key << "next" << YAML::Value << (int)page.header.next;
+      out << YAML::Key << "exit" << YAML::Value << (int)page.header.exit;
 
       out << YAML::Key << "pgain" << YAML::Value << YAML::Flow << YAML::BeginSeq;
       for (int i = 0; i < action_file_define::MAXNUM_JOINTS; ++i)
       {
-        out << (int)current_page->header.pgain[i];
+        out << (int)page.header.pgain[i];
       }
       out << YAML::EndSeq;
       out << YAML::EndMap;
 
-      // ステップ情報
       out << YAML::Key << "steps" << YAML::Value << YAML::BeginSeq;
-      for (int step = 0; step < current_page->header.stepnum; ++step)
+      for (int step = 0; step < page.header.stepnum; ++step)
       {
+        bool has_valid_position = false;
+        for (int joint = 0; joint < action_file_define::MAXNUM_JOINTS; ++joint)
+        {
+          if (page.step[step].position[joint] != action_file_define::INVALID_BIT_MASK)
+          {
+            has_valid_position = true;
+            break;
+          }
+        }
+
+        if (!has_valid_position)
+        {
+          continue;
+        }
+
         out << YAML::BeginMap;
         out << YAML::Key << "step_number" << YAML::Value << step;
 
@@ -661,51 +674,34 @@ bool ActionModule::saveYaml(std::string file_name)
           int joint_id = it.second;
           double position_value = 0.0;
 
-          if (current_page->step[step].position[joint_id] != action_file_define::INVALID_BIT_MASK)
+          if (page.step[step].position[joint_id] != action_file_define::INVALID_BIT_MASK)
           {
-            position_value = convertw4095ToRad(current_page->step[step].position[joint_id]);
+            position_value = convertw4095ToRad(page.step[step].position[joint_id]);
           }
 
           out << formatTo3DecimalPlaces(position_value);
         }
         out << YAML::EndSeq;
 
-        out << YAML::Key << "pause" << YAML::Value << (int)current_page->step[step].pause;
-        out << YAML::Key << "time" << YAML::Value << (int)current_page->step[step].time;
+        out << YAML::Key << "pause" << YAML::Value << (int)page.step[step].pause;
+        out << YAML::Key << "time" << YAML::Value << (int)page.step[step].time;
         out << YAML::EndMap;
       }
       out << YAML::EndSeq;
-      out << YAML::EndMap;  // 終了のマップ
+      out << YAML::EndMap;
 
-      // 次のページへ進む
-      if (current_page->header.next > 0)
-      {
-        current_page = &pages_[page_number_to_name_[current_page->header.next]];
-      }
-      else if (current_page->header.exit > 0)
-      {
-        current_page = &pages_[page_number_to_name_[current_page->header.exit]];
-      }
-      else
-      {
-        current_page = nullptr;
-      }
+      std::string yaml_file_name = fs::path(file_name).parent_path() / (page_name + ".yaml");
+      std::ofstream yaml_file(yaml_file_name);
+      yaml_file << out.c_str();
+      yaml_file.close();
+
+      std::cout << "Motion YAML file written to: " << yaml_file_name << std::endl;
     }
-
-    out << YAML::EndSeq;
-    out << YAML::EndMap;  // 終了のマップ
-
-    // ファイル名を適切に処理して保存
-    std::string sanitized_page_name = page_name;
-    std::replace(sanitized_page_name.begin(), sanitized_page_name.end(), ' ', '_');
-    std::string yaml_file_name = directory + "/" + sanitized_page_name + ".yaml";
-    std::ofstream yaml_file(yaml_file_name);
-    yaml_file << out.c_str();
-    yaml_file.close();
-
-    std::cout << "Motion YAML file written to: " << yaml_file_name << std::endl;
+    else
+    {
+      std::cout << "Failed to load page " << page_number << std::endl;
+    }
   }
-
   return true;
 }
 
