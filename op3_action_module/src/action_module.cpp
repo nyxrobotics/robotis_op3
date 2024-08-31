@@ -391,7 +391,7 @@ std::string ActionModule::toSnakeCase(const std::string& str)
 
 bool ActionModule::loadBinary(std::string file_name)
 {
-  ROS_INFO_STREAM("Loading binary action file: " << file_name);  // デバッグメッセージ
+  ROS_INFO_STREAM("Loading binary action file: " << file_name);
   FILE* action = fopen(file_name.c_str(), "r+b");
   if (action == nullptr)
   {
@@ -415,12 +415,11 @@ bool ActionModule::loadBinary(std::string file_name)
   }
 
   rewind(action);
-
-  bool has_error = false;  // エラーの存在を確認するためのフラグ
+  page_number_to_name_.clear();
+  pages_.clear();
 
   for (int page_number = 0; page_number < action_file_define::MAXNUM_PAGE; ++page_number)
   {
-    ROS_INFO_STREAM("Reading page number: " << page_number);  // デバッグメッセージ
     action_file_define::Page page;
 
     if (fread(&page, sizeof(action_file_define::Page), 1, action) != 1)
@@ -428,36 +427,24 @@ bool ActionModule::loadBinary(std::string file_name)
       std::string status_msg = "Error reading action file at page number: " + std::to_string(page_number);
       ROS_ERROR_STREAM(status_msg);
       publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-      has_error = true;
-      continue;  // エラーが発生しても次のページを読み込み続ける
-    }
-
-    ROS_INFO_STREAM("Loaded raw data for page number: " << page_number);  // デバッグメッセージ
-
-    if (!verifyChecksum(&page))
-    {
-      std::string status_msg = "Checksum error in action file at page number: " + std::to_string(page_number);
-      ROS_ERROR_STREAM(status_msg);
-      publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-      has_error = true;
-      continue;  // チェックサムエラーが発生しても次のページを読み込み続ける
+      fclose(action);
+      return false;
     }
 
     std::string page_name(reinterpret_cast<char*>(page.header.name),
                           strnlen(reinterpret_cast<char*>(page.header.name), sizeof(page.header.name)));
     pages_[page_name] = page;
-    ROS_INFO_STREAM("Successfully loaded page: " << page_name);  // デバッグメッセージ
+    page_number_to_name_[page_number] = page_name;
+
+    if (!verifyChecksum(&page))
+    {
+      ROS_WARN_STREAM("Checksum error in action file at page number: " << page_number);
+      resetPage(&page);
+    }
   }
 
   fclose(action);
-
-  if (has_error)
-  {
-    ROS_ERROR("Some pages failed to load correctly.");
-    return false;
-  }
-
-  ROS_INFO("Finished loading binary action file.");  // デバッグメッセージ
+  ROS_INFO("Finished loading binary action file.");
   return true;
 }
 
@@ -780,31 +767,25 @@ bool ActionModule::exportYamlFromBinary(std::string input_binary_file)
 
 bool ActionModule::start(int page_number)
 {
-  ROS_INFO_STREAM("Starting motion page: " << page_number);  // デバッグメッセージ
-
   if (page_number < 1 || page_number >= action_file_define::MAXNUM_PAGE)
   {
-    std::string status_msg = "Cannot play page.(" + convertIntToString(page_number) + " is invalid index)";
+    std::string status_msg = "Cannot play page. (" + convertIntToString(page_number) + " is an invalid index)";
     ROS_ERROR_STREAM(status_msg);
     publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
     return false;
   }
 
-  auto it = pages_.begin();
-  std::advance(it, page_number);
-
+  std::string page_name = page_number_to_name_[page_number];
+  auto it = pages_.find(page_name);
   if (it == pages_.end())
   {
-    ROS_ERROR_STREAM("Failed to find motion page: " << page_number);  // デバッグメッセージ
+    std::string status_msg = "Page not found for page number: " + std::to_string(page_number);
+    ROS_ERROR_STREAM(status_msg);
+    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
     return false;
   }
 
-  play_page_ = it->second;
-  play_page_idx_ = page_number;
-
-  ROS_INFO_STREAM("Successfully set motion page: " << page_number);  // デバッグメッセージ
-
-  return start(page_number, &play_page_);
+  return start(page_number, &(it->second));
 }
 
 bool ActionModule::start(std::string page_name)

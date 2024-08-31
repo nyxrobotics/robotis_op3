@@ -120,6 +120,7 @@ private:
   // 必要なメンバ変数
   std::map<std::string, int> joint_name_to_id_;
   std::map<int, std::string> joint_id_to_name_;
+  std::map<int, std::string> page_number_to_name_;  // ページ番号と名前のマッピングを保持するマップ
   std::map<std::string, action_file_define::Page> pages_;  // ページを保持するマップ
   action_file_define::Page play_page_;                     // 現在再生中のページ
   action_file_define::Page next_play_page_;                // 次に再生するページ
