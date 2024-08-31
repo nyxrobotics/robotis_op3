@@ -335,7 +335,6 @@ bool ActionModule::verifyChecksum(action_file_define::Page* page)
     checksum += *pt;
     pt++;
   }
-
   if (checksum != 0xff)
     return false;
 
@@ -392,19 +391,23 @@ std::string ActionModule::toSnakeCase(const std::string& str)
 
 bool ActionModule::loadBinary(std::string file_name)
 {
+  ROS_INFO_STREAM("Loading binary action file: " << file_name);  // デバッグメッセージ
   FILE* action = fopen(file_name.c_str(), "r+b");
   if (action == nullptr)
   {
-    std::string status_msg = "Cannot open action file!";
+    std::string status_msg = "Cannot open action file: " + file_name;
     ROS_ERROR_STREAM(status_msg);
     publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
     return false;
   }
 
   fseek(action, 0, SEEK_END);
-  if (ftell(action) != (long)(sizeof(action_file_define::Page) * action_file_define::MAXNUM_PAGE))
+  long file_size = ftell(action);
+  long expected_size = sizeof(action_file_define::Page) * action_file_define::MAXNUM_PAGE;
+
+  if (file_size != expected_size)
   {
-    std::string status_msg = "It's not an action file!";
+    std::string status_msg = "It's not an action file! (Unexpected file size: " + std::to_string(file_size) + ")";
     ROS_ERROR_STREAM(status_msg);
     publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
     fclose(action);
@@ -413,33 +416,48 @@ bool ActionModule::loadBinary(std::string file_name)
 
   rewind(action);
 
+  bool has_error = false;  // エラーの存在を確認するためのフラグ
+
   for (int page_number = 0; page_number < action_file_define::MAXNUM_PAGE; ++page_number)
   {
+    ROS_INFO_STREAM("Reading page number: " << page_number);  // デバッグメッセージ
     action_file_define::Page page;
+
     if (fread(&page, sizeof(action_file_define::Page), 1, action) != 1)
     {
-      std::string status_msg = "Error reading action file!";
+      std::string status_msg = "Error reading action file at page number: " + std::to_string(page_number);
       ROS_ERROR_STREAM(status_msg);
       publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-      fclose(action);
-      return false;
+      has_error = true;
+      continue;  // エラーが発生しても次のページを読み込み続ける
     }
+
+    ROS_INFO_STREAM("Loaded raw data for page number: " << page_number);  // デバッグメッセージ
 
     if (!verifyChecksum(&page))
     {
-      std::string status_msg = "Checksum error in action file!";
+      std::string status_msg = "Checksum error in action file at page number: " + std::to_string(page_number);
       ROS_ERROR_STREAM(status_msg);
       publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-      fclose(action);
-      return false;
+      has_error = true;
+      continue;  // チェックサムエラーが発生しても次のページを読み込み続ける
     }
 
     std::string page_name(reinterpret_cast<char*>(page.header.name),
                           strnlen(reinterpret_cast<char*>(page.header.name), sizeof(page.header.name)));
     pages_[page_name] = page;
+    ROS_INFO_STREAM("Successfully loaded page: " << page_name);  // デバッグメッセージ
   }
 
   fclose(action);
+
+  if (has_error)
+  {
+    ROS_ERROR("Some pages failed to load correctly.");
+    return false;
+  }
+
+  ROS_INFO("Finished loading binary action file.");  // デバッグメッセージ
   return true;
 }
 
@@ -476,12 +494,14 @@ bool ActionModule::saveBinary(std::string file_name)
   fclose(action);
   return true;
 }
+
 bool ActionModule::loadYaml(std::string file_name)
 {
+  ROS_INFO_STREAM("Loading YAML action file: " << file_name);  // デバッグメッセージ
   YAML::Node yaml_file = YAML::LoadFile(file_name);
   if (!yaml_file)
   {
-    std::string status_msg = "Cannot open YAML file!";
+    std::string status_msg = "Cannot open YAML file: " + file_name;
     ROS_ERROR_STREAM(status_msg);
     publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
     return false;
@@ -503,6 +523,8 @@ bool ActionModule::loadYaml(std::string file_name)
 
       std::string page_name = page_node["header"]["page_name"].as<std::string>();
       std::strncpy(reinterpret_cast<char*>(page.header.name), page_name.c_str(), sizeof(page.header.name) - 1);
+
+      ROS_INFO_STREAM("Loading page: " << page_name);  // デバッグメッセージ
 
       // Joint names の対応
       std::vector<std::string> joint_names = page_node["header"]["joint_names"].as<std::vector<std::string>>();
@@ -541,12 +563,13 @@ bool ActionModule::loadYaml(std::string file_name)
         step.pause = step_node["pause"].as<unsigned char>();
         step.time = step_node["time"].as<unsigned char>();
 
+        ROS_INFO_STREAM("Loaded step: " << step_index);  // デバッグメッセージ
+
         step_index++;
       }
 
-      // ページを `ActionModule` に格納（例として `pages_` マップに格納）
-      pages_[page_name] =
-          page;  // `pages_` は `std::map<std::string, action_file_define::Page>` として定義されていると仮定
+      // ページを `ActionModule` に格納
+      pages_[page_name] = page;
     }
   }
   catch (const YAML::Exception& e)
@@ -557,6 +580,7 @@ bool ActionModule::loadYaml(std::string file_name)
     return false;
   }
 
+  ROS_INFO("Finished loading YAML action file.");  // デバッグメッセージ
   return true;
 }
 
@@ -756,6 +780,8 @@ bool ActionModule::exportYamlFromBinary(std::string input_binary_file)
 
 bool ActionModule::start(int page_number)
 {
+  ROS_INFO_STREAM("Starting motion page: " << page_number);  // デバッグメッセージ
+
   if (page_number < 1 || page_number >= action_file_define::MAXNUM_PAGE)
   {
     std::string status_msg = "Cannot play page.(" + convertIntToString(page_number) + " is invalid index)";
@@ -768,10 +794,15 @@ bool ActionModule::start(int page_number)
   std::advance(it, page_number);
 
   if (it == pages_.end())
+  {
+    ROS_ERROR_STREAM("Failed to find motion page: " << page_number);  // デバッグメッセージ
     return false;
+  }
 
   play_page_ = it->second;
   play_page_idx_ = page_number;
+
+  ROS_INFO_STREAM("Successfully set motion page: " << page_number);  // デバッグメッセージ
 
   return start(page_number, &play_page_);
 }
@@ -796,6 +827,8 @@ bool ActionModule::start(std::string page_name)
 
 bool ActionModule::start(int page_number, action_file_define::Page* page)
 {
+  ROS_INFO_STREAM("Starting page: " << page_number);  // デバッグメッセージ
+
   if (!enable_)
   {
     std::string status_msg = "Action Module is disabled";
@@ -816,7 +849,7 @@ bool ActionModule::start(int page_number, action_file_define::Page* page)
 
   if (play_page_.header.repeat == 0 || play_page_.header.stepnum == 0)
   {
-    std::string status_msg = "Page " + convertIntToString(page_number) + " has no action\n";
+    std::string status_msg = "Page " + convertIntToString(page_number) + " has no action";
     ROS_ERROR_STREAM(status_msg);
     publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
     return false;
@@ -825,6 +858,8 @@ bool ActionModule::start(int page_number, action_file_define::Page* page)
   play_page_idx_ = page_number;
   first_driving_start_ = true;
   playing_ = true;
+
+  ROS_INFO_STREAM("Motion started for page: " << page_number);  // デバッグメッセージ
 
   return true;
 }
