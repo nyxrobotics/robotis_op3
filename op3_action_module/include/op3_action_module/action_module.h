@@ -55,8 +55,8 @@ public:
 
   bool loadBinary(std::string file_name);
   bool saveBinary(std::string file_name);
-  bool loadYaml(std::string file_name);
-  bool saveYaml(std::string file_name);
+  bool loadYaml(std::string directory_name);
+  bool saveYaml(std::string directory_name);
 
   bool loadFile(std::string file_name);
   bool createFile(std::string file_name);
