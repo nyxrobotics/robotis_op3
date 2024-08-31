@@ -436,6 +436,9 @@ bool ActionModule::loadBinary(std::string file_name)
     pages_[page_name] = page;
     page_number_to_name_[page_number] = page_name;
 
+    // 読み込んだモーションの番号とモーション名を表示
+    ROS_INFO_STREAM("Loaded motion: Page number = " << page_number << ", Page name = " << page_name);
+
     if (!verifyChecksum(&page))
     {
       ROS_WARN_STREAM("Checksum error in action file at page number: " << page_number);
@@ -484,7 +487,7 @@ bool ActionModule::saveBinary(std::string file_name)
 
 bool ActionModule::loadYaml(std::string file_name)
 {
-  ROS_INFO_STREAM("Loading YAML action file: " << file_name);  // デバッグメッセージ
+  ROS_INFO_STREAM("Loading YAML action file: " << file_name);
   YAML::Node yaml_file = YAML::LoadFile(file_name);
   if (!yaml_file)
   {
@@ -496,6 +499,7 @@ bool ActionModule::loadYaml(std::string file_name)
 
   try
   {
+    int page_number = 0;  // モーションの番号として使用
     for (auto page_node : yaml_file)
     {
       action_file_define::Page page;
@@ -557,6 +561,10 @@ bool ActionModule::loadYaml(std::string file_name)
 
       // ページを `ActionModule` に格納
       pages_[page_name] = page;
+
+      // 読み込んだモーションの番号とモーション名を表示
+      ROS_INFO_STREAM("Loaded motion: Page number = " << page_number << ", Page name = " << page_name);
+      page_number++;
     }
   }
   catch (const YAML::Exception& e)
@@ -567,7 +575,7 @@ bool ActionModule::loadYaml(std::string file_name)
     return false;
   }
 
-  ROS_INFO("Finished loading YAML action file.");  // デバッグメッセージ
+  ROS_INFO("Finished loading YAML action file.");
   return true;
 }
 
