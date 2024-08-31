@@ -52,6 +52,8 @@ public:
   bool loadFile(std::string file_name);
   bool createFile(std::string file_name);
 
+  bool exportYamlFromBinary(std::string input_binary_file);
+
   bool start(int page_number);
   bool start(std::string page_name);
   bool start(int page_number, action_file_define::Page* page);

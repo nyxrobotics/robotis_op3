@@ -411,7 +411,7 @@ std::string ActionModule::to_snake_case(const std::string& str)
 bool ActionModule::loadFile(std::string file_name)
 {
   FILE* action = fopen(file_name.c_str(), "r+b");
-  if (action == 0)
+  if (action == nullptr)
   {
     std::string status_msg = "Can not open action file!";
     ROS_ERROR_STREAM(status_msg);
@@ -429,10 +429,47 @@ bool ActionModule::loadFile(std::string file_name)
     return false;
   }
 
+  if (action_file_ != nullptr)
+    fclose(action_file_);
+
+  action_file_ = action;
+  return true;
+}
+
+bool ActionModule::createFile(std::string file_name)
+{
+  FILE* action = fopen(file_name.c_str(), "ab");
+  if (action == 0)
+  {
+    std::string status_msg = "Can not create Action file!";
+    ROS_ERROR_STREAM(status_msg);
+    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
+    return false;
+  }
+
+  action_file_define::Page page;
+  resetPage(&page);
+
+  for (int i = 0; i < action_file_define::MAXNUM_PAGE; i++)
+    fwrite((const void*)&page, 1, sizeof(action_file_define::Page), action);
+
   if (action_file_ != 0)
     fclose(action_file_);
 
   action_file_ = action;
+
+  return true;
+}
+
+bool ActionModule::exportYamlFromBinary(std::string input_binary_file)
+{
+  if (action_file_ == nullptr)
+  {
+    std::string status_msg = "No action file loaded!";
+    ROS_ERROR_STREAM(status_msg);
+    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
+    return false;
+  }
 
   for (int page_number = 0; page_number < action_file_define::MAXNUM_PAGE; ++page_number)
   {
@@ -538,7 +575,7 @@ bool ActionModule::loadFile(std::string file_name)
       out << YAML::EndSeq;
       out << YAML::EndMap;
 
-      std::string yaml_file_name = fs::path(file_name).parent_path() / (page_name + ".yaml");
+      std::string yaml_file_name = fs::path(input_binary_file).parent_path() / (page_name + ".yaml");
       std::ofstream yaml_file(yaml_file_name);
       yaml_file << out.c_str();
       yaml_file.close();
@@ -550,31 +587,6 @@ bool ActionModule::loadFile(std::string file_name)
       std::cout << "Failed to load page " << page_number << std::endl;
     }
   }
-
-  return true;
-}
-
-bool ActionModule::createFile(std::string file_name)
-{
-  FILE* action = fopen(file_name.c_str(), "ab");
-  if (action == 0)
-  {
-    std::string status_msg = "Can not create Action file!";
-    ROS_ERROR_STREAM(status_msg);
-    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-    return false;
-  }
-
-  action_file_define::Page page;
-  resetPage(&page);
-
-  for (int i = 0; i < action_file_define::MAXNUM_PAGE; i++)
-    fwrite((const void*)&page, 1, sizeof(action_file_define::Page), action);
-
-  if (action_file_ != 0)
-    fclose(action_file_);
-
-  action_file_ = action;
 
   return true;
 }
