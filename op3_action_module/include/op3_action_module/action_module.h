@@ -58,8 +58,6 @@ public:
   bool loadYaml(std::string directory_name);
   bool saveYaml(std::string directory_name);
 
-  bool loadFile(std::string file_name);
-  bool createFile(std::string file_name);
   bool exportYamlFromBinary(std::string input_binary_file);
 
   bool start(int page_number);
@@ -118,6 +116,7 @@ private:
   ros::Publisher done_msg_pub_;
 
   // 必要なメンバ変数
+  std::string motion_file_type_;
   std::map<std::string, int> joint_name_to_id_;
   std::map<int, std::string> joint_id_to_name_;
   std::map<int, std::string> page_number_to_name_;  // ページ番号と名前のマッピングを保持するマップ

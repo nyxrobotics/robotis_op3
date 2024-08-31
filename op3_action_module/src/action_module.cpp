@@ -105,11 +105,24 @@ void ActionModule::initialize(const int control_cycle_msec, robotis_framework::R
   }
 
   ros::NodeHandle ros_node;
-
-  std::string yaml_directory = ros::package::getPath("op3_action_module") + "/yaml";
-  std::string binary_file = ros::package::getPath("op3_action_module") + "/data/motion_4095.bin";
-
-  loadFile(binary_file);
+  ros_node.param<std::string>("motion_file_type", motion_file_type_, "binary");
+  if (motion_file_type_ != "binary" && motion_file_type_ != "yaml")
+  {
+    std::string status_msg = "Invalid motion_file_type parameter: " + motion_file_type_;
+    ROS_ERROR_STREAM(status_msg);
+    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
+    return;
+  }
+  else if (motion_file_type_ == "binary")
+  {
+    std::string binary_file = ros::package::getPath("op3_action_module") + "/data/motion_4095.bin";
+    loadBinary(binary_file);
+  }
+  else if (motion_file_type_ == "yaml")
+  {
+    std::string yaml_directory = ros::package::getPath("op3_action_module") + "/yaml";
+    loadYaml(yaml_directory);
+  }
   // saveYaml(yaml_directory);
 
   playing_ = false;
@@ -498,78 +511,6 @@ bool ActionModule::loadYaml(std::string directory_name)
 bool ActionModule::saveYaml(std::string directory_name)
 {
   // TODO
-  return true;
-}
-
-bool ActionModule::loadFile(std::string file_name)
-{
-  ros::NodeHandle nh;
-  std::string motion_file_type;
-  nh.param<std::string>("motion_file_type", motion_file_type, "binary");  // デフォルトは "binary"
-
-  if (motion_file_type == "yaml")
-  {
-    ROS_INFO("Loading motion data from YAML file.");
-    return loadYaml(file_name);
-  }
-  else if (motion_file_type == "binary")
-  {
-    ROS_INFO("Loading motion data from binary file.");
-    return loadBinary(file_name);
-  }
-  else
-  {
-    std::string status_msg = "Invalid motion_file_type parameter: " + motion_file_type;
-    ROS_ERROR_STREAM(status_msg);
-    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-    return false;
-  }
-}
-
-bool ActionModule::createFile(std::string file_name)
-{
-  ros::NodeHandle nh;
-  std::string motion_file_type;
-  nh.param<std::string>("motion_file_type", motion_file_type, "binary");  // デフォルトは "binary"
-
-  if (motion_file_type == "yaml")
-  {
-    return saveYaml(file_name);
-  }
-  else if (motion_file_type == "binary")
-  {
-    return saveBinary(file_name);
-  }
-  else
-  {
-    std::string status_msg = "Invalid motion_file_type parameter: " + motion_file_type;
-    ROS_ERROR_STREAM(status_msg);
-    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-    return false;
-  }
-}
-
-bool ActionModule::exportYamlFromBinary(std::string input_binary_file)
-{
-  // まずバイナリファイルをロードする
-  if (!loadBinary(input_binary_file))
-  {
-    std::string status_msg = "Failed to load binary file: " + input_binary_file;
-    ROS_ERROR_STREAM(status_msg);
-    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-    return false;
-  }
-
-  // YAMLファイルのエクスポート処理
-  if (!saveYaml(input_binary_file))
-  {
-    std::string status_msg = "Failed to export YAML files from binary.";
-    ROS_ERROR_STREAM(status_msg);
-    publishStatusMsg(robotis_controller_msgs::StatusMsg::STATUS_ERROR, status_msg);
-    return false;
-  }
-
-  ROS_INFO("YAML files exported successfully from binary.");
   return true;
 }
 
