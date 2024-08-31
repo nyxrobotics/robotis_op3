@@ -28,7 +28,11 @@
 #include <std_msgs/Int32.h>
 #include <std_msgs/String.h>
 #include <boost/thread.hpp>
-
+#include <yaml-cpp/yaml.h>
+#include <fstream>
+#include <map>
+#include <iomanip>
+#include <cmath>
 #include "robotis_controller_msgs/StatusMsg.h"
 #include "op3_action_module_msgs/IsRunning.h"
 #include "op3_action_module_msgs/StartAction.h"
@@ -49,9 +53,13 @@ public:
   void stop();
   bool isRunning();
 
+  bool loadBinary(std::string file_name);
+  bool saveBinary(std::string file_name);
+  bool loadYaml(std::string file_name);
+  bool saveYaml(std::string file_name);
+
   bool loadFile(std::string file_name);
   bool createFile(std::string file_name);
-
   bool exportYamlFromBinary(std::string input_binary_file);
 
   bool start(int page_number);
@@ -65,7 +73,7 @@ public:
   bool isRunning(int* playing_page_num, int* playing_step_num);
   double roundTo3DecimalPlaces(double value);
   std::string formatTo3DecimalPlaces(double value);
-  std::string to_snake_case(const std::string& str);
+  std::string toSnakeCase(const std::string& str);
   bool loadPage(int page_number, action_file_define::Page* page);
   bool savePage(int page_number, action_file_define::Page* page);
   void resetPage(action_file_define::Page* page);
@@ -108,12 +116,13 @@ private:
   /* sample subscriber & publisher */
   ros::Publisher status_msg_pub_;
   ros::Publisher done_msg_pub_;
-  /////////////////////////////////////////////////////////////////////////
+
+  // 必要なメンバ変数
   std::map<std::string, int> joint_name_to_id_;
   std::map<int, std::string> joint_id_to_name_;
-  FILE* action_file_;
-  action_file_define::Page play_page_;
-  action_file_define::Page next_play_page_;
+  std::map<std::string, action_file_define::Page> pages_;  // ページを保持するマップ
+  action_file_define::Page play_page_;                     // 現在再生中のページ
+  action_file_define::Page next_play_page_;                // 次に再生するページ
   action_file_define::Step current_step_;
 
   int play_page_idx_;
