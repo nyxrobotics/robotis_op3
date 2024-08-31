@@ -705,7 +705,7 @@ bool ActionModule::loadFile(std::string file_name)
 {
   ros::NodeHandle nh;
   std::string motion_file_type;
-  nh.param<std::string>("motion_file_type", motion_file_type, "binary");  // デフォルトは "binary"
+  nh.param<std::string>("motion_file_type", motion_file_type, "yaml");  // デフォルトは "binary"
 
   if (motion_file_type == "yaml")
   {
