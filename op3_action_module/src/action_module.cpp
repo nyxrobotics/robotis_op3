@@ -110,7 +110,7 @@ void ActionModule::initialize(const int control_cycle_msec, robotis_framework::R
   std::string action_file_path = ros_node.param<std::string>("action_file_path", path);
 
   loadFile(action_file_path);
-  saveYaml(action_file_path);
+  // saveYaml(action_file_path);
 
   playing_ = false;
 }
@@ -434,11 +434,14 @@ bool ActionModule::loadBinary(std::string file_name)
 
     std::string page_name(reinterpret_cast<char*>(page.header.name),
                           strnlen(reinterpret_cast<char*>(page.header.name), sizeof(page.header.name)));
+    page_name.erase(std::remove(page_name.begin(), page_name.end(), '\n'), page_name.end());
+    std::replace(page_name.begin(), page_name.end(), ' ', '_');
     pages_[page_name] = page;
     page_number_to_name_[page_number] = page_name;
 
     // 読み込んだモーションの番号とモーション名を表示
-    ROS_INFO_STREAM("Loaded motion: Page number = " << page_number << ", Page name = " << page_name);
+    ROS_INFO_STREAM("Loaded motion: page_number = " << page_number << ", page_name = " << page_name << ", next = "
+                                                    << (int)page.header.next << ", exit = " << (int)page.header.exit);
 
     if (!verifyChecksum(&page))
     {
