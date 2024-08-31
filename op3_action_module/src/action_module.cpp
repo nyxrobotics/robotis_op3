@@ -915,7 +915,7 @@ void ActionModule::enableAllJoints()
 
 void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dynamixel*> dxls)
 {
-  //// local Variable
+  //////////////////// local Variable
   uint8_t id;
   uint32_t total_time_256t;
   uint32_t pre_section_time_256t;
@@ -933,7 +933,7 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
   uint8_t direction_changed;
   int16_t speed_n;
 
-  //// Static Variable
+  ///////////////// Static Variable
   static uint16_t start_angle[action_file_define::MAXNUM_JOINTS];    // Start point of interpolation
   static uint16_t target_angle[action_file_define::MAXNUM_JOINTS];   // Target point of interpolation
   static int16_t moving_angle[action_file_define::MAXNUM_JOINTS];    // Total Moving Angle
@@ -953,7 +953,7 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
   static uint8_t play_repeat_count;
   static uint16_t next_play_page;
 
-  //// Const Variable
+  /////////////// Const Variable
   /**************************************
    * Section             /----\
    *                    /|    |\
@@ -963,21 +963,25 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
    *      PRE  MAIN   PRE MAIN POST PAUSE
    ***************************************/
 
-  if (!playing_)
+  if (playing_ == false)
   {
-    for (auto& dxl : dxls)
+    for (std::map<std::string, robotis_framework::Dynamixel*>::iterator dxls_it = dxls.begin(); dxls_it != dxls.end();
+         dxls_it++)
     {
-      std::string joint_name = dxl.first;
-      auto result_it = result_.find(joint_name);
+      std::string joint_name = dxls_it->first;
+
+      std::map<std::string, robotis_framework::DynamixelState*>::iterator result_it = action_result_.find(joint_name);
       if (result_it == result_.end())
         continue;
-
-      result_it->second->goal_position_ = dxl.second->dxl_state_->goal_position_;
+      else
+      {
+        result_it->second->goal_position_ = dxls_it->second->dxl_state_->goal_position_;
+      }
     }
     return;
   }
 
-  if (first_driving_start_)  // First start
+  if (first_driving_start_ == true)  // First start
   {
     first_driving_start_ = false;  // First Process end
     playing_finished_ = false;
@@ -995,23 +999,26 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
       id = joint_index;
       std::string joint_name = "";
 
-      auto id_to_name_it = joint_id_to_name_.find(id);
+      std::map<int, std::string>::iterator id_to_name_it = joint_id_to_name_.find(id);
       if (id_to_name_it == joint_id_to_name_.end())
         continue;
+      else
+        joint_name = id_to_name_it->second;
 
-      joint_name = id_to_name_it->second;
-
-      auto dxls_it = dxls.find(joint_name);
+      std::map<std::string, robotis_framework::Dynamixel*>::iterator dxls_it = dxls.find(joint_name);
       if (dxls_it == dxls.end())
         continue;
-
-      double goal_joint_angle_rad = dxls_it->second->dxl_state_->goal_position_;
-      target_angle[id] = convertRadTow4095(goal_joint_angle_rad);
-      last_out_speed[id] = 0;
-      moving_angle[id] = 0;
-      goal_speed[id] = 0;
+      else
+      {
+        double goal_joint_angle_rad = dxls_it->second->dxl_state_->goal_position_;
+        target_angle[id] = convertRadTow4095(goal_joint_angle_rad);
+        last_out_speed[id] = 0;
+        moving_angle[id] = 0;
+        goal_speed[id] = 0;
+      }
     }
   }
+
   if (unit_time_count < unit_time_num)  // Ongoing
   {
     unit_time_count++;
@@ -1025,13 +1032,13 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
         id = joint_index;
         std::string joint_name = "";
 
-        auto id_to_name_it = joint_id_to_name_.find(id);
+        std::map<int, std::string>::iterator id_to_name_it = joint_id_to_name_.find(id);
         if (id_to_name_it == joint_id_to_name_.end())
           continue;
         else
           joint_name = id_to_name_it->second;
 
-        auto dxls_it = dxls.find(joint_name);
+        std::map<std::string, robotis_framework::Dynamixel*>::iterator dxls_it = dxls.find(joint_name);
         if (dxls_it == dxls.end())
         {
           continue;
@@ -1102,13 +1109,13 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
     {
       id = joint_index;
       std::string joint_name = "";
-      auto id_to_name_it = joint_id_to_name_.find(id);
+      std::map<int, std::string>::iterator id_to_name_it = joint_id_to_name_.find(id);
       if (id_to_name_it == joint_id_to_name_.end())
         continue;
       else
         joint_name = id_to_name_it->second;
 
-      auto dxls_it = dxls.find(joint_name);
+      std::map<std::string, robotis_framework::Dynamixel*>::iterator dxls_it = dxls.find(joint_name);
       if (dxls_it == dxls.end())
         continue;
       else
@@ -1184,7 +1191,7 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
     // Ready for all in PRE Section
     if (section == PRE_SECTION)
     {
-      if (playing_finished_)  // If motion is finished
+      if (playing_finished_ == true)  // If motion is finished
       {
         playing_ = false;
         return;
@@ -1205,20 +1212,37 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
       if (page_step_count_ == play_page_.header.stepnum)  // If this is last step
       {
         // load next page
-        if (stop_playing_)  // STOP command
+        if (stop_playing_ == true)  // STOP command
         {
-          next_play_page = play_page_.header.exit;  // Go to
-          play_page_idx_ = next_play_page;
-          if (next_play_page == 0xff)  // If exit page is not specified
-          {
+          next_play_page = play_page_.header.exit;  // Go to Exit page
+        }
+        else
+        {
+          play_repeat_count--;
+          if (play_repeat_count > 0)          // if repeat count is remained
+            next_play_page = play_page_idx_;  // Set next page to present page
+          else
+            // Complete repeat
+            next_play_page = play_page_.header.next;  // set next page
+        }
+
+        if (next_play_page == 0)  // If there is no NEXT page, the motion playing will be finished after current step.
+          playing_finished_ = true;
+        else
+        {
+          // load next page
+          if (play_page_idx_ != next_play_page)
+            loadPage(next_play_page, &next_play_page_);
+          else
+            next_play_page_ = play_page_;
+
+          // If there is no playing information, the motion playing will be finished after current step.
+          if (next_play_page_.header.repeat == 0 || next_play_page_.header.stepnum == 0)
             playing_finished_ = true;
-            play_page_idx_ = 0;
-          }
-          return;
         }
       }
 
-      //// Calc Step Parameter
+      //////// Calc Step Parameter
       pause_time = (((unsigned short)play_page_.step[page_step_count_ - 1].pause) << 5) / play_page_.header.speed;
       max_speed =
           ((unsigned short)play_page_.step[page_step_count_ - 1].time * (unsigned short)play_page_.header.speed) >> 5;
@@ -1226,7 +1250,7 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
         max_speed = 1;
       max_angle = 0;
 
-      //// Calculate parameter of Joint
+      ////////// Calculate parameter of Joint
       for (unsigned int joint_index = 0; joint_index < action_file_define::MAXNUM_JOINTS; joint_index++)
       {
         id = joint_index;
@@ -1250,7 +1274,7 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
         // Find Next target angle
         if (page_step_count_ == play_page_.header.stepnum)  // If current step is last step
         {
-          if (playing_finished_)  // If it will be finished
+          if (playing_finished_ == true)  // If it will be finished
             next_target_angle = curr_target_angle;
           else
           {
@@ -1281,7 +1305,7 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
         }
 
         // Find finish type
-        if (direction_changed || pause_time || playing_finished_)
+        if (direction_changed || pause_time || playing_finished_ == true)
           finish_type[id] = ZERO_FINISH;
         else
           finish_type[id] = NONE_ZERO_FINISH;
@@ -1325,6 +1349,7 @@ void ActionModule::actionPlayProcess(std::map<std::string, robotis_framework::Dy
                 0;  // Acceleration and constant velocity steps have to be more than one in order to move
         }
       }
+
       total_time_256t = ((unsigned long)unit_time_total_num) << 1;  // /128 * 256
       pre_section_time_256t = ((unsigned long)accel_step) << 1;     // /128 * 256
       main_time_256t = total_time_256t - pre_section_time_256t;
