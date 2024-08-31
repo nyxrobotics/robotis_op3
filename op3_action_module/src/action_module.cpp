@@ -434,21 +434,16 @@ bool ActionModule::loadFile(std::string file_name)
 
   action_file_ = action;
 
-  // 読み込んだページを解析して書き出す
   for (int page_number = 0; page_number < action_file_define::MAXNUM_PAGE; ++page_number)
   {
     action_file_define::Page page;
     if (loadPage(page_number, &page))
     {
-      // ページ名の末尾の改行やヌル文字を削除
       std::string page_name(reinterpret_cast<char*>(page.header.name),
                             strnlen(reinterpret_cast<char*>(page.header.name), sizeof(page.header.name)));
       page_name.erase(std::remove(page_name.begin(), page_name.end(), '\n'), page_name.end());
-
-      // スペースをアンダースコアに置換
       std::replace(page_name.begin(), page_name.end(), ' ', '_');
 
-      // 有効なステップが存在するかをチェック
       bool has_valid_steps = false;
       for (int step = 0; step < page.header.stepnum; ++step)
       {
@@ -464,13 +459,11 @@ bool ActionModule::loadFile(std::string file_name)
           break;
       }
 
-      // 有効なステップがなければ次のページに進む
       if (!has_valid_steps)
       {
         continue;
       }
 
-      // 同名のモーションが複数ある場合に連番を付ける
       std::string base_name = page_name;
       static std::map<std::string, int> motion_file_counter;
       if (motion_file_counter[page_name] > 0)
@@ -479,31 +472,31 @@ bool ActionModule::loadFile(std::string file_name)
       }
       motion_file_counter[base_name]++;
 
-      // YAMLファイルにモーションデータを書き出し
       YAML::Emitter out;
       out << YAML::BeginMap;
 
-      // headerセクション
       out << YAML::Key << "header" << YAML::Value << YAML::BeginMap;
       out << YAML::Key << "page_number" << YAML::Value << page_number;
       out << YAML::Key << "page_name" << YAML::Value << page_name;
       out << YAML::Key << "repeat" << YAML::Value << (int)page.header.repeat;
+      out << YAML::Key << "schedule" << YAML::Value << (int)page.header.schedule;
       out << YAML::Key << "step_count" << YAML::Value << (int)page.header.stepnum;
+      out << YAML::Key << "speed" << YAML::Value << (int)page.header.speed;
+      out << YAML::Key << "accel" << YAML::Value << (int)page.header.accel;
+      out << YAML::Key << "next" << YAML::Value << (int)page.header.next;
+      out << YAML::Key << "exit" << YAML::Value << (int)page.header.exit;
 
-      // joint_names の出力
-      out << YAML::Key << "joint_names" << YAML::Value << YAML::Flow << YAML::BeginSeq;
-      for (const auto& it : joint_name_to_id_)
+      out << YAML::Key << "pgain" << YAML::Value << YAML::Flow << YAML::BeginSeq;
+      for (int i = 0; i < action_file_define::MAXNUM_JOINTS; ++i)
       {
-        out << to_snake_case(it.first);
+        out << (int)page.header.pgain[i];
       }
       out << YAML::EndSeq;
       out << YAML::EndMap;
 
-      // stepsセクション
       out << YAML::Key << "steps" << YAML::Value << YAML::BeginSeq;
       for (int step = 0; step < page.header.stepnum; ++step)
       {
-        // 有効なステップのみ書き出し
         bool has_valid_position = false;
         for (int joint = 0; joint < action_file_define::MAXNUM_JOINTS; ++joint)
         {
@@ -522,7 +515,6 @@ bool ActionModule::loadFile(std::string file_name)
         out << YAML::BeginMap;
         out << YAML::Key << "step_number" << YAML::Value << step;
 
-        // Positionsをフロースタイルで、少数点以下3桁で表示
         out << YAML::Key << "positions" << YAML::Value << YAML::Flow << YAML::BeginSeq;
         for (const auto& it : joint_name_to_id_)
         {
@@ -546,7 +538,6 @@ bool ActionModule::loadFile(std::string file_name)
       out << YAML::EndSeq;
       out << YAML::EndMap;
 
-      // モーションのYAMLファイルを書き出し
       std::string yaml_file_name = fs::path(file_name).parent_path() / (page_name + ".yaml");
       std::ofstream yaml_file(yaml_file_name);
       yaml_file << out.c_str();

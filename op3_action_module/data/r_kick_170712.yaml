@@ -2,8 +2,13 @@ header:
   page_number: 141
   page_name: r_kick_170712
   repeat: 1
+  schedule: 10
   step_count: 6
-  joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+  speed: 32
+  accel: 32
+  next: 0
+  exit: 0
+  pgain: [85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85]
 steps:
   - step_number: 0
     positions: [0.023, -0.348, 0.506, 0.158, -0.784, -0.436, -0.031, 0.000, 0.831, -0.089, 0.788, -0.517, 0.405, 0.785, 0.430, 0.014, -0.002, -0.838, 0.087, -0.787]

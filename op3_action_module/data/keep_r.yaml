@@ -2,8 +2,13 @@ header:
   page_number: 61
   page_name: keep_r
   repeat: 1
+  schedule: 10
   step_count: 2
-  joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+  speed: 32
+  accel: 32
+  next: 0
+  exit: 0
+  pgain: [85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 0, 0, 0, 0, 0]
 steps:
   - step_number: 0
     positions: [0.144, -0.015, 0.302, -1.195, 0.023, -0.328, -0.420, 0.005, 0.565, -0.084, 0.623, -1.200, -0.232, -0.032, 1.212, 0.291, -0.002, -2.451, 0.083, 0.408]

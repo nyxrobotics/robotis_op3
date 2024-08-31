@@ -2,8 +2,13 @@ header:
   page_number: 129
   page_name: push_up_1
   repeat: 1
+  schedule: 10
   step_count: 7
-  joint_names: [head_pan, head_tilt, l_ank_pitch, l_ank_roll, l_el, l_hip_pitch, l_hip_roll, l_hip_yaw, l_knee, l_sho_pitch, l_sho_roll, r_ank_pitch, r_ank_roll, r_el, r_hip_pitch, r_hip_roll, r_hip_yaw, r_knee, r_sho_pitch, r_sho_roll]
+  speed: 32
+  accel: 32
+  next: 0
+  exit: 0
+  pgain: [85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 85, 0, 0, 0, 0, 0]
 steps:
   - step_number: 0
     positions: [0.000, 0.158, 1.058, 0.028, -0.681, 0.017, -0.032, 0.003, 0.057, -1.175, 0.894, -1.060, -0.029, 0.680, -0.018, 0.031, -0.005, -0.058, 1.173, -0.896]
