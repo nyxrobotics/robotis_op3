@@ -40,9 +40,13 @@ catkin_package(
 ################################################################################
 # Build
 ################################################################################
-include_directories(${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIR}
+  include
+)
 
-add_executable(op3_optimization src/op3_optimization.cpp)
+add_executable(op3_optimization src/op3_optimization.cpp src/main.cpp)
 
 add_dependencies(
   op3_optimization
