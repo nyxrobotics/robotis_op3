@@ -12,4 +12,8 @@
   <node pkg="op3_manager" type="op3_manager" name="op3_manager" output="screen">
     <param name="angle_unit" value="30"/>
   </node>
+
+  <!-- OP3 Optimization for online walking -->
+  <include file="$(find op3_optimization)/launch/op3_optimization.launch"/>
+
 </launch>

@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+  <env name="LD_LIBRARY_PATH" value="/usr/lib/scilab:$(env LD_LIBRARY_PATH)"/>
+  <node name="op3_optimization" pkg="op3_optimization" type="op3_optimization" output="screen"/>
+</launch>
