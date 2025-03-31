@@ -4,14 +4,15 @@ project(op3_optimization)
 ################################################################################
 # Packages
 ################################################################################
-find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  std_msgs
-  sensor_msgs
-  geometry_msgs
-  op3_online_walking_module_msgs
-  robotis_math
-  scilab_optimization
+find_package(
+  catkin REQUIRED
+  COMPONENTS roscpp
+             std_msgs
+             sensor_msgs
+             geometry_msgs
+             op3_online_walking_module_msgs
+             robotis_math
+             scilab_optimization
 )
 
 find_package(Eigen3 REQUIRED)
@@ -29,35 +30,33 @@ find_package(Eigen3 REQUIRED)
 ################################################################################
 catkin_package(
   CATKIN_DEPENDS
-  roscpp
-  std_msgs
-  sensor_msgs
-  geometry_msgs
+    roscpp
+    std_msgs
+    sensor_msgs
+    geometry_msgs
   DEPENDS EIGEN3
 )
 
 ################################################################################
 # Build
 ################################################################################
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIR}
+include_directories(${catkin_INCLUDE_DIRS} ${EIGEN3_INCLUDE_DIR})
+
+add_executable(op3_optimization src/op3_optimization.cpp)
+
+add_dependencies(
+  op3_optimization
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
 )
 
-add_executable(op3_optimization
-  src/op3_optimization.cpp
-)
-
-add_dependencies(op3_optimization ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(op3_optimization
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(op3_optimization ${catkin_LIBRARIES})
 
 ################################################################################
 # Install
 ################################################################################
-install(TARGETS op3_optimization
+install(
+  TARGETS op3_optimization
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
