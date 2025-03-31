@@ -65,7 +65,6 @@ bool Op3Optimization::calcPreviewParam(double control_cycle, double lipm_height)
   double* matrix_E_imag = (double*)malloc(100 * sizeof(double));
   int row_K, col_K, row_P, col_P, row_E, col_E;
 
-  scilab_optimization_.initialize();
   scilab_optimization_.solveRiccatiEquation(matrix_K, &row_K, &col_K, matrix_P, &row_P, &col_P, matrix_E_real,
                                             matrix_E_imag, &row_E, &col_E, matrix_A, row_A, col_A, matrix_B, row_B,
                                             col_B, matrix_Q, row_Q, col_Q, matrix_R, row_R, col_R);
@@ -83,7 +82,6 @@ bool Op3Optimization::calcPreviewParam(double control_cycle, double lipm_height)
   free(matrix_E_real);
   free(matrix_E_imag);
 
-  scilab_optimization_.terminate();
   return true;
 }
 
