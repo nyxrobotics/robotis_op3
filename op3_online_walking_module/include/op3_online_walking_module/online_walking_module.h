@@ -1,18 +1,18 @@
 /*******************************************************************************
-* Copyright 2017 ROBOTIS CO., LTD.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
+ * Copyright 2017 ROBOTIS CO., LTD.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 
 /* Author: SCH */
 
@@ -64,8 +64,8 @@
 
 namespace robotis_op
 {
-
-enum CONTROL_TYPE {
+enum CONTROL_TYPE
+{
   JOINT_CONTROL,
   WHOLEBODY_CONTROL,
   WALKING_CONTROL,
@@ -73,13 +73,14 @@ enum CONTROL_TYPE {
   NONE
 };
 
-enum BALANCE_TYPE {
+enum BALANCE_TYPE
+{
   ON,
   OFF
 };
 
-class OnlineWalkingModule: public robotis_framework::MotionModule,
-                       public robotis_framework::Singleton<OnlineWalkingModule>
+class OnlineWalkingModule : public robotis_framework::MotionModule,
+                            public robotis_framework::Singleton<OnlineWalkingModule>
 {
 public:
   OnlineWalkingModule();
@@ -91,7 +92,7 @@ public:
   void setBodyOffsetCallback(const geometry_msgs::Pose::ConstPtr& msg);
   void setFootDistanceCallback(const std_msgs::Float64::ConstPtr& msg);
 
-  void goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose &msg);
+  void goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg);
   void goalKinematicsPoseCallback(const op3_online_walking_module_msgs::KinematicsPose& msg);
   void footStepCommandCallback(const op3_online_walking_module_msgs::FootStepCommand& msg);
   void walkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg);
@@ -99,36 +100,36 @@ public:
   void footStep2DCallback(const op3_online_walking_module_msgs::Step2DArray& msg);
 
   void imuDataCallback(const sensor_msgs::Imu::ConstPtr& msg);
-  void leftFootForceTorqueOutputCallback(const geometry_msgs::WrenchStamped::ConstPtr &msg);
-  void rightFootForceTorqueOutputCallback(const geometry_msgs::WrenchStamped::ConstPtr &msg);
+  void leftFootForceTorqueOutputCallback(const geometry_msgs::WrenchStamped::ConstPtr& msg);
+  void rightFootForceTorqueOutputCallback(const geometry_msgs::WrenchStamped::ConstPtr& msg);
 
   /* ROS Service Functions */
-  bool getJointPoseCallback(op3_online_walking_module_msgs::GetJointPose::Request &req,
-                            op3_online_walking_module_msgs::GetJointPose::Response &res);
-  bool getKinematicsPoseCallback(op3_online_walking_module_msgs::GetKinematicsPose::Request &req,
-                                 op3_online_walking_module_msgs::GetKinematicsPose::Response &res);
+  bool getJointPoseCallback(op3_online_walking_module_msgs::GetJointPose::Request& req,
+                            op3_online_walking_module_msgs::GetJointPose::Response& res);
+  bool getKinematicsPoseCallback(op3_online_walking_module_msgs::GetKinematicsPose::Request& req,
+                                 op3_online_walking_module_msgs::GetKinematicsPose::Response& res);
   bool getPreviewMatrix(op3_online_walking_module_msgs::PreviewRequest msg);
   bool definePreviewMatrix();
 
   /* ROS Framework Functions */
-  void initialize(const int control_cycle_msec, robotis_framework::Robot *robot);
-  void process(std::map<std::string, robotis_framework::Dynamixel *> dxls, std::map<std::string, double> sensors);
+  void initialize(const int control_cycle_msec, robotis_framework::Robot* robot);
+  void process(std::map<std::string, robotis_framework::Dynamixel*> dxls, std::map<std::string, double> sensors);
   void stop();
   bool isRunning();
 
   /* yaml Functions */
-  void parseBalanceGainData(const std::string &path);
-  void parseJointFeedbackGainData(const std::string &path);
-  void parseJointFeedforwardGainData(const std::string &path);
+  void parseBalanceGainData(const std::string& path);
+  void parseJointFeedbackGainData(const std::string& path);
+  void parseJointFeedforwardGainData(const std::string& path);
 
   /* ROS Publish Functions */
   void publishStatusMsg(unsigned int type, std::string msg);
 
   /* Parameter */
-  WholebodyControl  *wholebody_control_;
-  WalkingControl    *walking_control_;
+  WholebodyControl* wholebody_control_;
+  WalkingControl* walking_control_;
 
-  OP3Kinematics *op3_kdl_;
+  OP3Kinematics* op3_kdl_;
 
 private:
   void queueThread();
@@ -147,7 +148,7 @@ private:
   void initFeedforwardControl();
   void setFeedforwardControl();
 
-  void sensoryFeedback(const double &rlGyroErr, const double &fbGyroErr, double *balance_angle);
+  void sensoryFeedback(const double& rlGyroErr, const double& fbGyroErr, double* balance_angle);
 
   void calcRobotPose();
 
@@ -159,25 +160,25 @@ private:
 
   std::map<std::string, int> joint_name_to_id_;
 
-  double          control_cycle_sec_;
-  boost::thread   queue_thread_;
-  boost::mutex    queue_mutex_;
-  boost::mutex    imu_data_mutex_lock_;
+  double control_cycle_sec_;
+  boost::thread queue_thread_;
+  boost::mutex queue_mutex_;
+  boost::mutex imu_data_mutex_lock_;
 
   std_msgs::String movement_done_msg_;
 
-  ros::Publisher  status_msg_pub_;
-  ros::Publisher  movement_done_pub_;
-  ros::Publisher  goal_joint_state_pub_;
-  ros::Publisher  pelvis_pose_pub_;
+  ros::Publisher status_msg_pub_;
+  ros::Publisher movement_done_pub_;
+  ros::Publisher goal_joint_state_pub_;
+  ros::Publisher pelvis_pose_pub_;
 
-//  ros::ServiceClient get_preview_matrix_client_;
+  //  ros::ServiceClient get_preview_matrix_client_;
 
   CONTROL_TYPE control_type_;
 
-  bool    is_moving_;
-  int     mov_size_, mov_step_;
-  double  mov_time_;
+  bool is_moving_;
+  int mov_size_, mov_step_;
+  double mov_time_;
 
   bool goal_initialize_;
   bool joint_control_initialize_;
@@ -189,10 +190,10 @@ private:
   int walking_leg_, walking_phase_;
   int walking_size_, walking_step_;
 
-  robotis_framework::MinimumJerk *joint_tra_;
-  robotis_framework::MinimumJerk *balance_tra_;
-  robotis_framework::MinimumJerk *body_offset_tra_;
-  robotis_framework::MinimumJerkViaPoint *feed_forward_tra_;
+  robotis_framework::MinimumJerk* joint_tra_;
+  robotis_framework::MinimumJerk* balance_tra_;
+  robotis_framework::MinimumJerk* body_offset_tra_;
+  robotis_framework::MinimumJerkViaPoint* feed_forward_tra_;
 
   size_t number_of_joints_;
   std::vector<std::string> joint_name_;
@@ -200,7 +201,7 @@ private:
 
   // Joint Command
   std::vector<double_t> curr_joint_accel_, curr_joint_vel_, curr_joint_pos_;
-  std::vector<double_t> des_joint_accel_,  des_joint_vel_,  des_joint_pos_;
+  std::vector<double_t> des_joint_accel_, des_joint_vel_, des_joint_pos_;
   std::vector<double_t> goal_joint_accel_, goal_joint_vel_, goal_joint_pos_;
 
   std::vector<double_t> des_joint_feedback_;
@@ -211,7 +212,7 @@ private:
   std::vector<double_t> des_r_arm_pos_, des_r_arm_vel_, des_r_arm_accel_, des_r_arm_Q_;
   std::vector<double_t> des_l_leg_pos_, des_l_leg_vel_, des_l_leg_accel_, des_l_leg_Q_;
   std::vector<double_t> des_r_leg_pos_, des_r_leg_vel_, des_r_leg_accel_, des_r_leg_Q_;
-  std::vector<double_t> des_body_pos_,  des_body_vel_,  des_body_accel_,  des_body_Q_;
+  std::vector<double_t> des_body_pos_, des_body_vel_, des_body_accel_, des_body_Q_;
 
   // Walking Control
   std::vector<double_t> x_lipm_, y_lipm_;
@@ -236,8 +237,8 @@ private:
   // Balance Control
   BALANCE_TYPE balance_type_;
 
-  bool  is_balancing_;
-  int   balance_step_, balance_size_;
+  bool is_balancing_;
+  int balance_step_, balance_size_;
 
   BalanceControlUsingPDController balance_control_;
   BalancePDController joint_feedback_[12];
@@ -251,8 +252,8 @@ private:
   std::vector<double_t> des_body_offset_;
   std::vector<double_t> goal_body_offset_;
 
-  bool  is_offset_updating_;
-  int   body_offset_step_, body_offset_size_;
+  bool is_offset_updating_;
+  int body_offset_step_, body_offset_size_;
 
   //
   double foot_distance_;
@@ -323,6 +324,6 @@ private:
   double total_mass_;
 };
 
-}
+}  // namespace robotis_op
 
 #endif
