@@ -1015,7 +1015,8 @@ void OnlineWalkingModule::initWalkingControl()
   preview_request_.control_cycle = control_cycle_sec_;
 
   bool get_preview_matrix = false;
-  get_preview_matrix = definePreviewMatrix();
+  // get_preview_matrix = definePreviewMatrix();
+  get_preview_matrix = getPreviewMatrix(preview_request_);
 
   if (get_preview_matrix == true)
   {
