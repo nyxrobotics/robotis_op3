@@ -1036,8 +1036,8 @@ void OnlineWalkingModule::initWalkingControl()
                                      des_l_leg_pos_, des_l_leg_Q_);
       }
 
-      walking_control_->calcPreviewParam(preview_response_K_, preview_response_K_row_, preview_response_K_col_,
-                                         preview_response_P_, preview_response_P_row_, preview_response_P_row_);
+      walking_control_->calcPreviewParam(preview_response_.K, preview_response_.K_row, preview_response_.K_col,
+                                         preview_response_.P, preview_response_.P_row, preview_response_.P_row);
 
       is_moving_ = true;
 
@@ -1821,9 +1821,9 @@ bool OnlineWalkingModule::definePreviewMatrix()
   K.push_back(3340.410380);
   K.push_back(69.798325);
 
-  preview_response_K_ = K;
-  preview_response_K_row_ = 1;
-  preview_response_K_col_ = 4;
+  preview_response_.K = K;
+  preview_response_.K_row = 1;
+  preview_response_.K_col = 4;
 
   std::vector<double_t> P;
   P.push_back(33.130169);
@@ -1843,9 +1843,9 @@ bool OnlineWalkingModule::definePreviewMatrix()
   P.push_back(0.922502);
   P.push_back(0.012336);
 
-  preview_response_P_ = P;
-  preview_response_P_row_ = 4;
-  preview_response_P_col_ = 4;
+  preview_response_.P = P;
+  preview_response_.P_row = 4;
+  preview_response_.P_col = 4;
 
   return true;
 }
