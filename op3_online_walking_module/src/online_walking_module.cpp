@@ -182,9 +182,12 @@ void OnlineWalkingModule::initialize(const int control_cycle_msec, robotis_frame
   pelvis_pose_pub_ = ros_node.advertise<geometry_msgs::PoseStamped>("/robotis/pelvis_pose", 1);
 
   // Service
-  //  get_preview_matrix_client_ =
-  //  ros_node.serviceClient<op3_online_walking_module_msgs::GetPreviewMatrix>("/robotis/online_walking/get_preview_matrix",
-  //  0);
+  get_preview_matrix_client_ = ros_node.serviceClient<op3_online_walking_module_msgs::GetPreviewMatrix>("/robotis/"
+                                                                                                        "online_"
+                                                                                                        "walking/"
+                                                                                                        "get_preview_"
+                                                                                                        "matrix",
+                                                                                                        0);
 }
 
 void OnlineWalkingModule::queueThread()
@@ -1765,6 +1768,49 @@ bool OnlineWalkingModule::getKinematicsPoseCallback(op3_online_walking_module_ms
   res.pose.pose = msg;
 
   return true;
+}
+
+bool OnlineWalkingModule::getPreviewMatrix(op3_online_walking_module_msgs::PreviewRequest preview_request)
+{
+  op3_online_walking_module_msgs::GetPreviewMatrix get_preview_matrix;
+
+  // request
+  get_preview_matrix.request.req.control_cycle = preview_request.control_cycle;
+  get_preview_matrix.request.req.lipm_height = preview_request.lipm_height;
+
+  // response
+  if (get_preview_matrix_client_.call(get_preview_matrix))
+  {
+    preview_response_.K = get_preview_matrix.response.res.K;
+    preview_response_.K_row = get_preview_matrix.response.res.K_row;
+    preview_response_.K_col = get_preview_matrix.response.res.K_col;
+
+    preview_response_.P = get_preview_matrix.response.res.P;
+    preview_response_.P_row = get_preview_matrix.response.res.P_row;
+    preview_response_.P_col = get_preview_matrix.response.res.P_col;
+
+    ROS_INFO("preview_response_.K");
+    for (int i = 0; i < preview_response_.K.size(); i++)
+    {
+      ROS_INFO("%f", get_preview_matrix.response.res.K[i]);
+    }
+
+    ROS_INFO("K_row : %d", get_preview_matrix.response.res.K_row);
+    ROS_INFO("K_col : %d", get_preview_matrix.response.res.K_col);
+
+    ROS_INFO("preview_response_.P");
+    for (int i = 0; i < preview_response_.P.size(); i++)
+    {
+      ROS_INFO("%f", get_preview_matrix.response.res.P[i]);
+    }
+
+    ROS_INFO("P_row : %d", get_preview_matrix.response.res.P_row);
+    ROS_INFO("P_col : %d", get_preview_matrix.response.res.P_col);
+
+    return true;
+  }
+  else
+    return false;
 }
 
 bool OnlineWalkingModule::definePreviewMatrix()

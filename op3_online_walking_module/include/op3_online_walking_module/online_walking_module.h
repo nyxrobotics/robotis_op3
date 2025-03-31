@@ -171,8 +171,7 @@ private:
   ros::Publisher movement_done_pub_;
   ros::Publisher goal_joint_state_pub_;
   ros::Publisher pelvis_pose_pub_;
-
-  //  ros::ServiceClient get_preview_matrix_client_;
+  ros::ServiceClient get_preview_matrix_client_;
 
   CONTROL_TYPE control_type_;
 
