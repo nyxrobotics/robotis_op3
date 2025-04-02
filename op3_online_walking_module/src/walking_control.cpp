@@ -297,20 +297,14 @@ void WalkingControl::calcFootStepParam()
   const std::string& command = foot_step_command_.command;
   const std::string& start_leg = foot_step_command_.start_leg;
 
-  int walking_start_leg;
-  if (start_leg == "left_leg")
-    walking_start_leg = LEFT_LEG;
-  else if (start_leg == "right_leg")
+  int walking_start_leg = LEFT_LEG;
+  if (start_leg == "right_leg")
     walking_start_leg = RIGHT_LEG;
 
-  if (command == "right")
-    walking_start_leg = RIGHT_LEG;
-  else if (command == "left")
+  if (command == "left" || command == "turn_left")
     walking_start_leg = LEFT_LEG;
-  else if (command == "turn_right")
+  else if (command == "right" || command == "turn_right")
     walking_start_leg = RIGHT_LEG;
-  else if (command == "turn_left")
-    walking_start_leg = LEFT_LEG;
 
   int walking_leg = walking_start_leg;
   double foot_angle = init_body_yaw_angle_;
@@ -319,44 +313,38 @@ void WalkingControl::calcFootStepParam()
   {
     geometry_msgs::Pose2D msg;
 
-    // Forward step
+    // Forward/backward step
     if (command == "forward")
       msg.x = foot_step_command_.step_length;
-    if (command == "backward")
+    else if (command == "backward")
       msg.x = -foot_step_command_.step_length;
+    else
+      msg.x = 0.0;
 
     // Side step
     int lr_sign = 0;
-    if (command == "left")
-    {
-      if (walking_leg == LEFT_LEG)
-        lr_sign = 1;
-      else if (walking_leg == RIGHT_LEG)
-        lr_sign = 0;
-    }
-    else if (command == "right")
-    {
-      if (walking_leg == LEFT_LEG)
-        lr_sign = 0;
-      else if (walking_leg == RIGHT_LEG)
-        lr_sign = 1;
-    }
+    if (command == "left" && walking_leg == LEFT_LEG)
+      lr_sign = 1;
+    else if (command == "right" && walking_leg == RIGHT_LEG)
+      lr_sign = 1;
+
     msg.y = foot_origin_shift_y_ + static_cast<double>(lr_sign) * foot_step_command_.side_length;
 
     // Rotation (theta)
-    double theta = 0;
+    double theta = 0.0;
     if (command == "turn_left")
       theta = foot_step_command_.step_angle;
     else if (command == "turn_right")
       theta = -foot_step_command_.step_angle;
 
     // Stabilize initial/final steps
-    if (i == 0 || i == 1 || i == foot_step_size_ - 2 || i == foot_step_size_ - 1)
+    if (i <= 1 || i >= foot_step_size_ - 2)
     {
       msg.x = 0.0;
       msg.y = foot_origin_shift_y_;
       theta = 0.0;
     }
+
     foot_angle += theta;
     msg.theta = foot_angle;
 
