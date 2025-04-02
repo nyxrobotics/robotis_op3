@@ -320,46 +320,35 @@ void WalkingControl::calcFootStepParam()
     geometry_msgs::Pose2D msg;
 
     // Forward step
-    msg.x = foot_step_command_.step_length;
-    if (command == "stop")
-      msg.x = 0.0;
+    if (command == "forward")
+      msg.x = foot_step_command_.step_length;
     if (command == "backward")
-      msg.x *= -1.0;
-    if (command == "left" || command == "right")
-      msg.x = 0.0;
-    if (command == "turn_left" || command == "turn_right")
-      msg.x = 0.0;
+      msg.x = -foot_step_command_.step_length;
 
     // Side step
-    walking_leg = walking_start_leg++ % LEG_COUNT;
-    double lr = walking_leg;
-
+    int lr_sign = 0;
     if (command == "left")
     {
-      lr += -1.0;
-      lr *= -1.0;
+      if (walking_leg == LEFT_LEG)
+        lr_sign = 1;
+      else if (walking_leg == RIGHT_LEG)
+        lr_sign = 0;
     }
     else if (command == "right")
     {
-      // no change
+      if (walking_leg == LEFT_LEG)
+        lr_sign = 0;
+      else if (walking_leg == RIGHT_LEG)
+        lr_sign = 1;
     }
-    else if (command == "turn_left" || command == "turn_right" || command == "forward" || command == "backward" ||
-             command == "stop")
-    {
-      lr = 0.0;
-    }
-
-    msg.y = foot_origin_shift_y_ + lr * foot_step_command_.side_length;
+    msg.y = foot_origin_shift_y_ + static_cast<double>(lr_sign) * foot_step_command_.side_length;
 
     // Rotation (theta)
-    double theta = foot_step_command_.step_angle;
-
-    if (command == "turn_right")
-      theta *= -1.0;
-    else if (command == "turn_left")
-      ;   // keep as is
-    else  // forward, backward, stop, left, right
-      theta = 0.0;
+    double theta = 0;
+    if (command == "turn_left")
+      theta = foot_step_command_.step_angle;
+    else if (command == "turn_right")
+      theta = -foot_step_command_.step_angle;
 
     // Stabilize initial/final steps
     if (i == 0 || i == 1 || i == foot_step_size_ - 2 || i == foot_step_size_ - 1)
@@ -368,12 +357,13 @@ void WalkingControl::calcFootStepParam()
       msg.y = foot_origin_shift_y_;
       theta = 0.0;
     }
-
     foot_angle += theta;
     msg.theta = foot_angle;
 
     foot_step_param_.moving_foot.push_back(walking_leg);
     foot_step_param_.data.push_back(msg);
+
+    walking_leg = (walking_leg + 1) % LEG_COUNT;
   }
 
   calcGoalFootPose();
