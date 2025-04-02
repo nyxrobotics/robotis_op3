@@ -316,62 +316,54 @@ void WalkingControl::calcFootStepParam()
   {
     geometry_msgs::Pose2D msg;
 
-    // Forward Step
+    // Forward step
     msg.x = foot_step_command_.step_length;
 
     if (foot_step_command_.command == "stop")
-      msg.x *= 0.0;
-
+      msg.x = 0.0;
     if (foot_step_command_.command == "backward")
       msg.x *= -1.0;
-
     if (foot_step_command_.command == "left" || foot_step_command_.command == "right")
-      msg.x *= 0.0;
-
+      msg.x = 0.0;
     if (foot_step_command_.command == "turn_left" || foot_step_command_.command == "turn_right")
-      msg.x *= 0.0;
+      msg.x = 0.0;
 
-    // Side Step
+    // Side step
     walking_leg = walking_start_leg++ % LEG_COUNT;
     double lr = walking_leg;
+
     if (foot_step_command_.command == "left")
     {
       lr += -1.0;
       lr *= -1.0;
     }
-
     if ((foot_step_command_.command == "forward" || foot_step_command_.command == "backward") &&
         foot_step_command_.start_leg == "left_leg")
     {
       lr += -1.0;
       lr *= -1.0;
     }
-
     if (foot_step_command_.command == "turn_left" || foot_step_command_.command == "turn_right")
       lr = 0.0;
-
     if (foot_step_command_.command == "stop")
-      lr *= 0.0;
+      lr = 0.0;
 
     msg.y = foot_origin_shift_y_ + lr * foot_step_command_.side_length;
 
-    // Theta
-    double theta;
-    theta = foot_step_command_.step_angle;
+    // Rotation (theta)
+    double theta = foot_step_command_.step_angle;
 
     if (foot_step_command_.command == "turn_right")
       theta *= -1.0;
-
     if ((foot_step_command_.command == "forward" || foot_step_command_.command == "backward") &&
         foot_step_command_.start_leg == "right_leg")
       theta *= -1.0;
-
     if (foot_step_command_.command == "left" || foot_step_command_.command == "right")
-      theta *= 0.0;
-
+      theta = 0.0;
     if (foot_step_command_.command == "stop")
-      theta *= 0.0;
+      theta = 0.0;
 
+    // Stabilize initial/final steps
     if (i == 0 || i == 1 || i == foot_step_size_ - 2 || i == foot_step_size_ - 1)
     {
       msg.x = 0.0;
