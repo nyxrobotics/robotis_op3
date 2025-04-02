@@ -294,19 +294,22 @@ void WalkingControl::calcFootStepParam()
   fin_time_ = foot_step_command_.step_time;
   foot_step_size_ = foot_step_command_.step_num;
 
+  const std::string& command = foot_step_command_.command;
+  const std::string& start_leg = foot_step_command_.start_leg;
+
   int walking_start_leg;
-  if (foot_step_command_.start_leg == "left_leg")
+  if (start_leg == "left_leg")
     walking_start_leg = LEFT_LEG;
-  else if (foot_step_command_.start_leg == "right_leg")
+  else if (start_leg == "right_leg")
     walking_start_leg = RIGHT_LEG;
 
-  if (foot_step_command_.command == "right")
+  if (command == "right")
     walking_start_leg = RIGHT_LEG;
-  else if (foot_step_command_.command == "left")
+  else if (command == "left")
     walking_start_leg = LEFT_LEG;
-  else if (foot_step_command_.command == "turn_right")
+  else if (command == "turn_right")
     walking_start_leg = RIGHT_LEG;
-  else if (foot_step_command_.command == "turn_left")
+  else if (command == "turn_left")
     walking_start_leg = LEFT_LEG;
 
   int walking_leg = walking_start_leg;
@@ -318,49 +321,44 @@ void WalkingControl::calcFootStepParam()
 
     // Forward step
     msg.x = foot_step_command_.step_length;
-
-    if (foot_step_command_.command == "stop")
+    if (command == "stop")
       msg.x = 0.0;
-    if (foot_step_command_.command == "backward")
+    if (command == "backward")
       msg.x *= -1.0;
-    if (foot_step_command_.command == "left" || foot_step_command_.command == "right")
+    if (command == "left" || command == "right")
       msg.x = 0.0;
-    if (foot_step_command_.command == "turn_left" || foot_step_command_.command == "turn_right")
+    if (command == "turn_left" || command == "turn_right")
       msg.x = 0.0;
 
     // Side step
     walking_leg = walking_start_leg++ % LEG_COUNT;
     double lr = walking_leg;
 
-    if (foot_step_command_.command == "left")
+    if (command == "left")
     {
       lr += -1.0;
       lr *= -1.0;
     }
-    if ((foot_step_command_.command == "forward" || foot_step_command_.command == "backward") &&
-        foot_step_command_.start_leg == "left_leg")
+    else if (command == "right")
     {
-      lr += -1.0;
-      lr *= -1.0;
+      // no change
     }
-    if (foot_step_command_.command == "turn_left" || foot_step_command_.command == "turn_right")
+    else if (command == "turn_left" || command == "turn_right" || command == "forward" || command == "backward" ||
+             command == "stop")
+    {
       lr = 0.0;
-    if (foot_step_command_.command == "stop")
-      lr = 0.0;
+    }
 
     msg.y = foot_origin_shift_y_ + lr * foot_step_command_.side_length;
 
     // Rotation (theta)
     double theta = foot_step_command_.step_angle;
 
-    if (foot_step_command_.command == "turn_right")
+    if (command == "turn_right")
       theta *= -1.0;
-    if ((foot_step_command_.command == "forward" || foot_step_command_.command == "backward") &&
-        foot_step_command_.start_leg == "right_leg")
-      theta *= -1.0;
-    if (foot_step_command_.command == "left" || foot_step_command_.command == "right")
-      theta = 0.0;
-    if (foot_step_command_.command == "stop")
+    else if (command == "turn_left")
+      ;   // keep as is
+    else  // forward, backward, stop, left, right
       theta = 0.0;
 
     // Stabilize initial/final steps
