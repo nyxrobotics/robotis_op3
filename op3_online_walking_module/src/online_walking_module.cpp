@@ -35,6 +35,8 @@ OnlineWalkingModule::OnlineWalkingModule()
   , walking_phase_(DSP)
   , total_mass_(3.5)
   , foot_distance_(0.07)
+  , pelvis_to_body_height_(0.0907)
+  , ground_to_body_height_(0.3402256)
 {
   enable_ = false;
   module_name_ = "online_walking_module";
@@ -176,10 +178,10 @@ void OnlineWalkingModule::initialize(const int control_cycle_msec, robotis_frame
   ros::NodeHandle ros_node;
 
   // Publisher
-  status_msg_pub_ = ros_node.advertise<robotis_controller_msgs::StatusMsg>("/robotis/status", 1);
-  movement_done_pub_ = ros_node.advertise<std_msgs::String>("/robotis/movement_done", 1);
-  goal_joint_state_pub_ = ros_node.advertise<sensor_msgs::JointState>("/robotis/online_walking/goal_joint_states", 1);
-  pelvis_pose_pub_ = ros_node.advertise<geometry_msgs::PoseStamped>("/robotis/pelvis_pose", 1);
+  status_msg_pub_ = ros_node.advertise<robotis_controller_msgs::StatusMsg>("/robotis/status", 5);
+  movement_done_pub_ = ros_node.advertise<std_msgs::String>("/robotis/movement_done", 5);
+  goal_joint_state_pub_ = ros_node.advertise<sensor_msgs::JointState>("/robotis/online_walking/goal_joint_states", 5);
+  pelvis_pose_pub_ = ros_node.advertise<geometry_msgs::PoseStamped>("/robotis/pelvis_pose", 5);
 
   // Service
   get_preview_matrix_client_ = ros_node.serviceClient<op3_online_walking_module_msgs::GetPreviewMatrix>("/robotis/"
@@ -241,7 +243,7 @@ void OnlineWalkingModule::resetBodyPose()
 {
   des_body_pos_[0] = 0.0;
   des_body_pos_[1] = 0.0;
-  des_body_pos_[2] = 0.3402256;
+  des_body_pos_[2] = ground_to_body_height_;
 
   des_body_Q_[0] = 0.0;
   des_body_Q_[1] = 0.0;
@@ -1648,7 +1650,7 @@ void OnlineWalkingModule::process(std::map<std::string, robotis_framework::Dynam
 
   pelvis_pose_msg.pose.position.x = des_body_pos_[0];
   pelvis_pose_msg.pose.position.y = des_body_pos_[1];
-  pelvis_pose_msg.pose.position.z = des_body_pos_[2] - 0.0907;
+  pelvis_pose_msg.pose.position.z = des_body_pos_[2] - pelvis_to_body_height_;
 
   pelvis_pose_msg.pose.orientation.x = des_body_Q_[0];
   pelvis_pose_msg.pose.orientation.y = des_body_Q_[1];

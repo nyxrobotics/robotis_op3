@@ -248,8 +248,9 @@ private:
   bool is_offset_updating_;
   int body_offset_step_, body_offset_size_;
 
-  //
   double foot_distance_;
+  double pelvis_to_body_height_;
+  double ground_to_body_height_;
 
   // Balance Gain
   double foot_roll_gyro_p_gain_;

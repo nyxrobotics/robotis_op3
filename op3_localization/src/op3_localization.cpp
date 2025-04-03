@@ -64,10 +64,10 @@ OP3Localization::~OP3Localization()
 void OP3Localization::initialize()
 {
   // subscriber
-  pelvis_pose_msg_sub_ = ros_node_.subscribe("/robotis/pelvis_pose", 5,
-                                             &OP3Localization::pelvisPoseCallback, this);
-//  pelvis_base_walking_msg_sub_ = ros_node_.subscribe("/robotis/pelvis_pose_base_walking", 5,
-//                                                               &OP3Localization::pelvisPoseBaseWalkingCallback, this);
+  pelvis_pose_msg_sub_ = ros_node_.subscribe("/robotis/pelvis_pose", 5, &OP3Localization::pelvisPoseCallback, this);
+  //  pelvis_base_walking_msg_sub_ = ros_node_.subscribe("/robotis/pelvis_pose_base_walking", 5,
+  //                                                               &OP3Localization::pelvisPoseBaseWalkingCallback,
+  //                                                               this);
 
   pelvis_reset_msg_sub_ = ros_node_.subscribe("/robotis/pelvis_pose_reset", 5,
                                                        &OP3Localization::pelvisPoseResetCallback, this);
