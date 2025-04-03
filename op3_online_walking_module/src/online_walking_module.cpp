@@ -249,7 +249,7 @@ void OnlineWalkingModule::resetBodyPose()
   des_body_Q_[3] = 1.0;
 
   des_r_leg_pos_[0] = 0.0;
-  des_r_leg_pos_[1] = -0.5 * foot_distance_;  //-0.045; //-0.035;
+  des_r_leg_pos_[1] = -0.5 * foot_distance_;
   des_r_leg_pos_[2] = 0.0;
 
   des_r_leg_Q_[0] = 0.0;
@@ -258,7 +258,7 @@ void OnlineWalkingModule::resetBodyPose()
   des_r_leg_Q_[3] = 1.0;
 
   des_l_leg_pos_[0] = 0.0;
-  des_l_leg_pos_[1] = 0.5 * foot_distance_;  // 0.045; //0.035;
+  des_l_leg_pos_[1] = 0.5 * foot_distance_;
   des_l_leg_pos_[2] = 0.0;
 
   des_l_leg_Q_[0] = 0.0;
@@ -266,15 +266,13 @@ void OnlineWalkingModule::resetBodyPose()
   des_l_leg_Q_[2] = 0.0;
   des_l_leg_Q_[3] = 1.0;
 
-  x_lipm_[0] = des_body_pos_[0];
+  x_lipm_[0] = 0.0;
   x_lipm_[1] = 0.0;
   x_lipm_[2] = 0.0;
 
-  y_lipm_[0] = des_body_pos_[1];
+  y_lipm_[0] = 0.0;
   y_lipm_[1] = 0.0;
   y_lipm_[2] = 0.0;
-
-  walking_param_.zmp_offset_x = des_body_pos_[0];
 }
 
 void OnlineWalkingModule::parseBalanceGainData(const std::string& path)
