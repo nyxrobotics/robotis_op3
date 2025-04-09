@@ -36,7 +36,7 @@ OnlineWalkingModule::OnlineWalkingModule()
   , total_mass_(3.5)
   , foot_distance_(0.07)
   , pelvis_to_body_height_(0.0907)
-  , ground_to_body_height_(0.3402256)
+  , ground_to_pelvis_height_(0.2495)
 {
   enable_ = false;
   module_name_ = "online_walking_module";
@@ -243,7 +243,7 @@ void OnlineWalkingModule::resetBodyPose()
 {
   des_body_pos_[0] = 0.0;
   des_body_pos_[1] = 0.0;
-  des_body_pos_[2] = ground_to_body_height_;
+  des_body_pos_[2] = ground_to_pelvis_height_ + pelvis_to_body_height_;
 
   des_body_Q_[0] = 0.0;
   des_body_Q_[1] = 0.0;
