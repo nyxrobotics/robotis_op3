@@ -200,16 +200,16 @@ void OnlineWalkingModule::queueThread()
   ros_node.setCallbackQueue(&callback_queue);
 
   // Subscriber
-  ros::Subscriber reset_body_sub_ =
+  ros::Subscriber reset_body_sub =
       ros_node.subscribe("/robotis/online_walking/reset_body", 5, &OnlineWalkingModule::setResetBodyCallback, this);
-  ros::Subscriber joint_pose_sub_ = ros_node.subscribe("/robotis/online_walking/goal_joint_pose", 5,
-                                                       &OnlineWalkingModule::goalJointPoseCallback, this);
-  ros::Subscriber kinematics_pose_sub_ = ros_node.subscribe("/robotis/online_walking/goal_kinematics_pose", 5,
-                                                            &OnlineWalkingModule::goalKinematicsPoseCallback, this);
-  ros::Subscriber foot_step_command_sub_ = ros_node.subscribe("/robotis/online_walking/foot_step_command", 5,
-                                                              &OnlineWalkingModule::footStepCommandCallback, this);
-  ros::Subscriber online_walking_param_sub_ = ros_node.subscribe(
-      "/robotis/online_walking/walking_param", 5, &OnlineWalkingModule::onlineWalkingParamCallback, this);
+  ros::Subscriber joint_pose_sub = ros_node.subscribe("/robotis/online_walking/goal_joint_pose", 5,
+                                                      &OnlineWalkingModule::goalJointPoseCallback, this);
+  ros::Subscriber kinematics_pose_sub = ros_node.subscribe("/robotis/online_walking/goal_kinematics_pose", 5,
+                                                           &OnlineWalkingModule::goalKinematicsPoseCallback, this);
+  ros::Subscriber foot_step_command_sub = ros_node.subscribe("/robotis/online_walking/foot_step_command", 5,
+                                                             &OnlineWalkingModule::footStepCommandCallback, this);
+  ros::Subscriber online_walking_param_sub = ros_node.subscribe("/robotis/online_walking/walking_param", 5,
+                                                                &OnlineWalkingModule::onlineWalkingParamCallback, this);
 
   ros::Subscriber wholebody_balance_msg_sub = ros_node.subscribe(
       "/robotis/online_walking/wholebody_balance_msg", 5, &OnlineWalkingModule::setWholebodyBalanceMsgCallback, this);

@@ -1,18 +1,18 @@
 /*******************************************************************************
-* Copyright 2017 ROBOTIS CO., LTD.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*******************************************************************************/
+ * Copyright 2017 ROBOTIS CO., LTD.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
 
 /* Author: Kayman */
 
@@ -47,7 +47,6 @@
 
 namespace robotis_op
 {
-
 typedef struct
 {
   double x, y, z;
@@ -60,8 +59,7 @@ typedef struct
 
 class WalkingModule : public robotis_framework::MotionModule, public robotis_framework::Singleton<WalkingModule>
 {
-
- public:
+public:
   enum
   {
     PHASE0 = 0,
@@ -73,8 +71,8 @@ class WalkingModule : public robotis_framework::MotionModule, public robotis_fra
   WalkingModule();
   virtual ~WalkingModule();
 
-  void initialize(const int control_cycle_msec, robotis_framework::Robot *robot);
-  void process(std::map<std::string, robotis_framework::Dynamixel *> dxls, std::map<std::string, double> sensors);
+  void initialize(const int control_cycle_msec, robotis_framework::Robot* robot);
+  void process(std::map<std::string, robotis_framework::Dynamixel*> dxls, std::map<std::string, double> sensors);
   void stop();
   bool isRunning();
   void onModuleEnable();
@@ -86,14 +84,14 @@ class WalkingModule : public robotis_framework::MotionModule, public robotis_fra
   }
   double getBodySwingY()
   {
-    return body_swing_y;
+    return body_swing_y_;
   }
   double getBodySwingZ()
   {
-    return body_swing_z;
+    return body_swing_z_;
   }
 
- private:
+private:
   enum
   {
     WalkingDisable = 0,
@@ -107,26 +105,26 @@ class WalkingModule : public robotis_framework::MotionModule, public robotis_fra
   void queueThread();
 
   /* ROS Topic Callback Functions */
-  void walkingCommandCallback(const std_msgs::String::ConstPtr &msg);
-  void walkingParameterCallback(const op3_walking_module_msgs::WalkingParam::ConstPtr &msg);
-  bool getWalkigParameterCallback(op3_walking_module_msgs::GetWalkingParam::Request &req,
-                                  op3_walking_module_msgs::GetWalkingParam::Response &res);
+  void walkingCommandCallback(const std_msgs::String::ConstPtr& msg);
+  void walkingParameterCallback(const op3_walking_module_msgs::WalkingParam::ConstPtr& msg);
+  bool getWalkigParameterCallback(op3_walking_module_msgs::GetWalkingParam::Request& req,
+                                  op3_walking_module_msgs::GetWalkingParam::Response& res);
 
   /* ROS Service Callback Functions */
-  void processPhase(const double &time_unit);
-  bool computeLegAngle(double *leg_angle);
-  void computeArmAngle(double *arm_angle);
-  void sensoryFeedback(const double &rlGyroErr, const double &fbGyroErr, double *balance_angle);
+  void processPhase(const double& time_unit);
+  bool computeLegAngle(double* leg_angle);
+  void computeArmAngle(double* arm_angle);
+  void sensoryFeedback(const double& rlGyroErr, const double& fbGyroErr, double* balance_angle);
 
   void publishStatusMsg(unsigned int type, std::string msg);
   double wSin(double time, double period, double period_shift, double mag, double mag_shift);
-  bool computeIK(double *out, double x, double y, double z, double a, double b, double c);
+  bool computeIK(double* out, double x, double y, double z, double a, double b, double c);
   void updateTimeParam();
   void updateMovementParam();
   void updatePoseParam();
   void startWalking();
-  void loadWalkingParam(const std::string &path);
-  void saveWalkingParam(std::string &path);
+  void loadWalkingParam(const std::string& path);
+  void saveWalkingParam(std::string& path);
   void iniPoseTraGene(double mov_time);
 
   OP3KinematicsDynamics* op3_kd_;
@@ -171,12 +169,13 @@ class WalkingModule : public robotis_framework::MotionModule, public robotis_fra
   double phase2_time_;
   double phase3_time_;
 
-  double x_offset_;
-  double y_offset_;
-  double z_offset_;
-  double r_offset_;
-  double p_offset_;
-  double a_offset_;
+  double foot_x_offset_;
+  double foot_y_offset_;
+  double foot_z_offset_;
+  double foot_roll_offset_;
+  double foot_pitch_offset_;
+  double foot_yaw_offset_;
+  double hit_pitch_offset_;
 
   double x_swap_phase_shift_;
   double x_swap_amplitude_;
@@ -202,7 +201,6 @@ class WalkingModule : public robotis_framework::MotionModule, public robotis_fra
 
   double pelvis_offset_;
   double pelvis_swing_;
-  double hit_pitch_offset_;
   double arm_swing_gain_;
 
   bool ctrl_running_;
@@ -210,10 +208,10 @@ class WalkingModule : public robotis_framework::MotionModule, public robotis_fra
   double time_;
 
   int phase_;
-  double body_swing_y;
-  double body_swing_z;
+  double body_swing_y_;
+  double body_swing_z_;
 };
 
-}
+}  // namespace robotis_op
 
 #endif /* OP3_WALKING_MODULE_H_ */

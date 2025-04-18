@@ -244,6 +244,13 @@ private:
   // Body Offset
   std::vector<double_t> des_body_offset_;
   std::vector<double_t> goal_body_offset_;
+  double foot_x_offset_;
+  double foot_y_offset_;
+  double foot_z_offset_;
+  double foot_roll_offset_;
+  double foot_pitch_offset_;
+  double foot_yaw_offset_;
+  double hit_pitch_offset_;
 
   bool is_offset_updating_;
   int body_offset_step_, body_offset_size_;
