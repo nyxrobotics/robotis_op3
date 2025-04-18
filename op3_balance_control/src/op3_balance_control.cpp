@@ -199,6 +199,7 @@ BalanceControlUsingDampingConroller::BalanceControlUsingDampingConroller()
   cob_x_manual_adjustment_m_ = 0;
   cob_y_manual_adjustment_m_ = 0;
   cob_z_manual_adjustment_m_ = 0;
+  cob_pitch_manual_adjustment_rad_ = 0;
 
   // gyro gain
   gyro_balance_gain_ratio_ = 0.0;
@@ -372,6 +373,7 @@ void BalanceControlUsingDampingConroller::process(int* balance_error, Eigen::Mat
   pose_cob_adjustment_.coeffRef(0) = cob_x_manual_adjustment_m_;
   pose_cob_adjustment_.coeffRef(1) = cob_y_manual_adjustment_m_;
   pose_cob_adjustment_.coeffRef(2) = cob_z_manual_adjustment_m_;
+  pose_cob_adjustment_.coeffRef(4) = cob_pitch_manual_adjustment_rad_;
 
   pose_right_foot_adjustment_.coeffRef(0) = r_foot_x_adjustment_by_force_x_;
   pose_right_foot_adjustment_.coeffRef(1) = r_foot_y_adjustment_by_force_y_;
@@ -603,9 +605,26 @@ void BalanceControlUsingDampingConroller::setMaximumAdjustment(
 void BalanceControlUsingDampingConroller::setCOBManualAdjustment(double cob_x_adjustment_m, double cob_y_adjustment_m,
                                                                  double cob_z_adjustment_m)
 {
+  setCOBManualAdjustmentX(cob_x_adjustment_m);
+  setCOBManualAdjustmentY(cob_y_adjustment_m);
+  setCOBManualAdjustmentZ(cob_z_adjustment_m);
+}
+
+void BalanceControlUsingDampingConroller::setCOBManualAdjustmentX(double cob_x_adjustment_m)
+{
   cob_x_manual_adjustment_m_ = cob_x_adjustment_m;
+}
+void BalanceControlUsingDampingConroller::setCOBManualAdjustmentY(double cob_y_adjustment_m)
+{
   cob_y_manual_adjustment_m_ = cob_y_adjustment_m;
+}
+void BalanceControlUsingDampingConroller::setCOBManualAdjustmentZ(double cob_z_adjustment_m)
+{
   cob_z_manual_adjustment_m_ = cob_z_adjustment_m;
+}
+void BalanceControlUsingDampingConroller::setCOBManualAdjustmentPitch(double cob_pitch_adjustment_rad)
+{
+  cob_pitch_manual_adjustment_rad_ = cob_pitch_adjustment_rad;
 }
 
 double BalanceControlUsingDampingConroller::getCOBManualAdjustmentX()
@@ -621,6 +640,11 @@ double BalanceControlUsingDampingConroller::getCOBManualAdjustmentY()
 double BalanceControlUsingDampingConroller::getCOBManualAdjustmentZ()
 {
   return cob_z_manual_adjustment_m_;
+}
+
+double BalanceControlUsingDampingConroller::getCOBManualAdjustmentPitch()
+{
+  return cob_pitch_manual_adjustment_rad_;
 }
 
 void BalanceControlUsingDampingConroller::setGyroBalanceGainRatio(double gyro_balance_gain_ratio)
@@ -683,6 +707,7 @@ BalanceControlUsingPDController::BalanceControlUsingPDController()
   cob_x_manual_adjustment_m_ = 0;
   cob_y_manual_adjustment_m_ = 0;
   cob_z_manual_adjustment_m_ = 0;
+  cob_pitch_manual_adjustment_rad_ = 0;
 
   // maximum adjustment
   cob_x_adjustment_abs_max_m_ = 0.05;
@@ -703,9 +728,7 @@ BalanceControlUsingPDController::BalanceControlUsingPDController()
   mat_robot_to_left_foot_modified_ = Eigen::MatrixXd::Identity(4, 4);
   pose_cob_adjustment_ = Eigen::VectorXd::Zero(6);
   pose_right_foot_adjustment_ = Eigen::VectorXd::Zero(6);
-  ;
   pose_left_foot_adjustment_ = Eigen::VectorXd::Zero(6);
-  ;
 }
 
 BalanceControlUsingPDController::~BalanceControlUsingPDController()
@@ -855,6 +878,7 @@ void BalanceControlUsingPDController::process(int* balance_error, Eigen::MatrixX
   pose_cob_adjustment_.coeffRef(0) = cob_x_manual_adjustment_m_;
   pose_cob_adjustment_.coeffRef(1) = cob_y_manual_adjustment_m_;
   pose_cob_adjustment_.coeffRef(2) = cob_z_manual_adjustment_m_;
+  pose_cob_adjustment_.coeffRef(4) = cob_pitch_manual_adjustment_rad_;
 
   pose_right_foot_adjustment_.coeffRef(0) = r_foot_x_adjustment_by_force_x_;
   pose_right_foot_adjustment_.coeffRef(1) = r_foot_y_adjustment_by_force_y_;
@@ -1082,9 +1106,29 @@ void BalanceControlUsingPDController::setMaximumAdjustment(
 void BalanceControlUsingPDController::setCOBManualAdjustment(double cob_x_adjustment_m, double cob_y_adjustment_m,
                                                              double cob_z_adjustment_m)
 {
+  setCOBManualAdjustmentX(cob_x_adjustment_m);
+  setCOBManualAdjustmentY(cob_y_adjustment_m);
+  setCOBManualAdjustmentZ(cob_z_adjustment_m);
+}
+
+void BalanceControlUsingPDController::setCOBManualAdjustmentX(double cob_x_adjustment_m)
+{
   cob_x_manual_adjustment_m_ = cob_x_adjustment_m;
+}
+
+void BalanceControlUsingPDController::setCOBManualAdjustmentY(double cob_y_adjustment_m)
+{
   cob_y_manual_adjustment_m_ = cob_y_adjustment_m;
+}
+
+void BalanceControlUsingPDController::setCOBManualAdjustmentZ(double cob_z_adjustment_m)
+{
   cob_z_manual_adjustment_m_ = cob_z_adjustment_m;
+}
+
+void BalanceControlUsingPDController::setCOBManualAdjustmentPitch(double cob_pitch_adjustment_rad)
+{
+  cob_pitch_manual_adjustment_rad_ = cob_pitch_adjustment_rad;
 }
 
 double BalanceControlUsingPDController::getCOBManualAdjustmentX()
@@ -1100,4 +1144,9 @@ double BalanceControlUsingPDController::getCOBManualAdjustmentY()
 double BalanceControlUsingPDController::getCOBManualAdjustmentZ()
 {
   return cob_z_manual_adjustment_m_;
+}
+
+double BalanceControlUsingPDController::getCOBManualAdjustmentPitch()
+{
+  return cob_pitch_manual_adjustment_rad_;
 }

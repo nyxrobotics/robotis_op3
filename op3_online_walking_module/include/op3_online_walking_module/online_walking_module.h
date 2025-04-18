@@ -244,6 +244,7 @@ private:
   // Body Offset
   std::vector<double_t> des_body_offset_;
   std::vector<double_t> goal_body_offset_;
+  double pelvis_offset_;
   double foot_x_offset_;
   double foot_y_offset_;
   double foot_z_offset_;

@@ -37,6 +37,7 @@ OnlineWalkingModule::OnlineWalkingModule()
   , foot_distance_(0.07)
   , pelvis_to_body_height_(0.0907)
   , ground_to_pelvis_height_(0.2495)
+  , pelvis_offset_(0.5)
 {
   enable_ = false;
   module_name_ = "online_walking_module";

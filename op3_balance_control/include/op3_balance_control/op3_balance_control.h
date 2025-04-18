@@ -137,9 +137,14 @@ public:
 
   // Manual Adjustment
   void setCOBManualAdjustment(double cob_x_adjustment_m, double cob_y_adjustment_m, double cob_z_adjustment_m);
+  void setCOBManualAdjustmentX(double cob_x_adjustment_m);
+  void setCOBManualAdjustmentY(double cob_y_adjustment_m);
+  void setCOBManualAdjustmentZ(double cob_z_adjustment_m);
+  void setCOBManualAdjustmentPitch(double cob_pitch_adjustment_rad);
   double getCOBManualAdjustmentX();
   double getCOBManualAdjustmentY();
   double getCOBManualAdjustmentZ();
+  double getCOBManualAdjustmentPitch();
 
   void setGyroBalanceGainRatio(double gyro_balance_gain_ratio);
   double getGyroBalanceGainRatio(void);
@@ -199,6 +204,7 @@ private:
   double cob_x_manual_adjustment_m_;
   double cob_y_manual_adjustment_m_;
   double cob_z_manual_adjustment_m_;
+  double cob_pitch_manual_adjustment_rad_;
 
   // result of balance control
   double foot_roll_adjustment_by_gyro_roll_;
@@ -292,9 +298,14 @@ public:
 
   // Manual Adjustment
   void setCOBManualAdjustment(double cob_x_adjustment_m, double cob_y_adjustment_m, double cob_z_adjustment_m);
+  void setCOBManualAdjustmentX(double cob_x_adjustment_m);
+  void setCOBManualAdjustmentY(double cob_y_adjustment_m);
+  void setCOBManualAdjustmentZ(double cob_z_adjustment_m);
+  void setCOBManualAdjustmentPitch(double cob_pitch_adjustment_rad);
   double getCOBManualAdjustmentX();
   double getCOBManualAdjustmentY();
   double getCOBManualAdjustmentZ();
+  double getCOBManualAdjustmentPitch();
 
   // damping controllers
   BalancePDController foot_roll_gyro_ctrl_;
@@ -361,6 +372,7 @@ private:
   double cob_x_manual_adjustment_m_;
   double cob_y_manual_adjustment_m_;
   double cob_z_manual_adjustment_m_;
+  double cob_pitch_manual_adjustment_rad_;
 
   // result of balance control
   double foot_roll_adjustment_by_gyro_roll_;
