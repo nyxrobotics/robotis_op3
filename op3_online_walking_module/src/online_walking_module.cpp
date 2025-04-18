@@ -119,11 +119,11 @@ OnlineWalkingModule::OnlineWalkingModule()
   resetBodyPose();
 
   // walking parameter default
-  walking_param_.dsp_ratio = 0.2;
-  walking_param_.lipm_height = 0.12;
-  walking_param_.foot_height_max = 0.05;
-  walking_param_.zmp_offset_x = 0.0;  // not applied
-  walking_param_.zmp_offset_y = 0.0;
+  online_walking_param_.dsp_ratio = 0.2;
+  online_walking_param_.lipm_height = 0.12;
+  online_walking_param_.foot_height_max = 0.05;
+  online_walking_param_.zmp_offset_x = 0.0;  // not applied
+  online_walking_param_.zmp_offset_y = 0.0;
 
   des_balance_gain_ratio_.resize(1, 0.0);
   goal_balance_gain_ratio_.resize(1, 0.0);
@@ -208,8 +208,9 @@ void OnlineWalkingModule::queueThread()
                                                             &OnlineWalkingModule::goalKinematicsPoseCallback, this);
   ros::Subscriber foot_step_command_sub_ = ros_node.subscribe("/robotis/online_walking/foot_step_command", 5,
                                                               &OnlineWalkingModule::footStepCommandCallback, this);
-  ros::Subscriber walking_param_sub_ =
-      ros_node.subscribe("/robotis/online_walking/walking_param", 5, &OnlineWalkingModule::walkingParamCallback, this);
+  ros::Subscriber online_walking_param_sub_ = ros_node.subscribe(
+      "/robotis/online_walking/walking_param", 5, &OnlineWalkingModule::onlineWalkingParamCallback, this);
+
   ros::Subscriber wholebody_balance_msg_sub = ros_node.subscribe(
       "/robotis/online_walking/wholebody_balance_msg", 5, &OnlineWalkingModule::setWholebodyBalanceMsgCallback, this);
   ros::Subscriber body_offset_msg_sub =
@@ -588,9 +589,9 @@ void OnlineWalkingModule::setResetBodyCallback(const std_msgs::Bool::ConstPtr& m
   }
 }
 
-void OnlineWalkingModule::walkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg)
+void OnlineWalkingModule::onlineWalkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg)
 {
-  walking_param_ = msg;
+  online_walking_param_ = msg;
 }
 
 void OnlineWalkingModule::goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg)
@@ -1006,9 +1007,10 @@ void OnlineWalkingModule::initWalkingControl()
 
   walking_step_ = 0;
 
-  walking_control_ = new WalkingControl(control_cycle_sec_, walking_param_.dsp_ratio, walking_param_.lipm_height,
-                                        walking_param_.foot_height_max, walking_param_.zmp_offset_x,
-                                        walking_param_.zmp_offset_y, x_lipm_, y_lipm_, foot_distance_);
+  walking_control_ =
+      new WalkingControl(control_cycle_sec_, online_walking_param_.dsp_ratio, online_walking_param_.lipm_height,
+                         online_walking_param_.foot_height_max, online_walking_param_.zmp_offset_x,
+                         online_walking_param_.zmp_offset_y, x_lipm_, y_lipm_, foot_distance_);
 
   double lipm_height = walking_control_->getLipmHeight();
   preview_request_.lipm_height = lipm_height;
@@ -1107,7 +1109,7 @@ void OnlineWalkingModule::initFeedforwardControl()
   double init_time = 0.0;
   double fin_time = mov_time_;
   double via_time = 0.5 * (init_time + fin_time);
-  double dsp_ratio = walking_param_.dsp_ratio;
+  double dsp_ratio = online_walking_param_.dsp_ratio;
 
   feed_forward_tra_ = new robotis_framework::MinimumJerkViaPoint(init_time, fin_time, via_time, dsp_ratio, zero_vector,
                                                                  zero_vector, zero_vector, zero_vector, zero_vector,
