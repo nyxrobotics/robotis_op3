@@ -91,6 +91,14 @@ public:
   void setWholebodyBalanceMsgCallback(const std_msgs::String::ConstPtr& msg);
   void setBodyOffsetCallback(const geometry_msgs::Pose::ConstPtr& msg);
   void setFootDistanceCallback(const std_msgs::Float64::ConstPtr& msg);
+  // void setFootXOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
+  // void setFootYOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
+  // void setFootZOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
+  // void setFootRollOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
+  // void setFootPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
+  // void setFootYawOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
+  void setHipPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
+  void setPelvisOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
 
   void goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg);
   void goalKinematicsPoseCallback(const op3_online_walking_module_msgs::KinematicsPose& msg);
@@ -191,7 +199,8 @@ private:
 
   robotis_framework::MinimumJerk* joint_tra_;
   robotis_framework::MinimumJerk* balance_tra_;
-  robotis_framework::MinimumJerk* body_offset_tra_;
+  robotis_framework::MinimumJerk* body_offset_xyz_tra_;
+  robotis_framework::MinimumJerk* body_offset_rpy_tra_;
   robotis_framework::MinimumJerkViaPoint* feed_forward_tra_;
 
   size_t number_of_joints_;
@@ -242,8 +251,10 @@ private:
   std::vector<double_t> goal_balance_gain_ratio_;
 
   // Body Offset
-  std::vector<double_t> des_body_offset_;
-  std::vector<double_t> goal_body_offset_;
+  std::vector<double_t> des_body_offset_xyz_;
+  std::vector<double_t> des_body_offset_rpy_;
+  std::vector<double_t> goal_body_offset_xyz_;
+  std::vector<double_t> goal_body_offset_rpy_;
   double pelvis_offset_;
   double foot_x_offset_;
   double foot_y_offset_;

@@ -149,8 +149,10 @@ OnlineWalkingModule::OnlineWalkingModule()
   balance_r_foot_torque_z_ = 0.0;
 
   // Body Offset
-  des_body_offset_.resize(3, 0.0);
-  goal_body_offset_.resize(3, 0.0);
+  goal_body_offset_xyz_.resize(3, 0.0);  // Initial Boddy offset (Target)
+  goal_body_offset_rpy_.resize(3, 0.0);
+  des_body_offset_xyz_.resize(3, 0.0);  // Smoothed Body offset
+  des_body_offset_rpy_.resize(3, 0.0);
 
   std::string balance_gain_path = ros::package::getPath("op3_online_walking_module") + "/config/balance_gain.yaml";
   parseBalanceGainData(balance_gain_path);
@@ -218,6 +220,10 @@ void OnlineWalkingModule::queueThread()
       ros_node.subscribe("/robotis/online_walking/body_offset", 5, &OnlineWalkingModule::setBodyOffsetCallback, this);
   ros::Subscriber foot_distance_msg_sub = ros_node.subscribe("/robotis/online_walking/foot_distance", 5,
                                                              &OnlineWalkingModule::setFootDistanceCallback, this);
+  ros::Subscriber hip_pitch_offset_msg_sub = ros_node.subscribe("/robotis/online_walking/hip_pitch_offset", 5,
+                                                                &OnlineWalkingModule::setHipPitchOffsetCallback, this);
+  ros::Subscriber pelvis_offset_msg_sub = ros_node.subscribe("/robotis/online_walking/pelvis_offset", 5,
+                                                             &OnlineWalkingModule::setPelvisOffsetCallback, this);
 
   ros::Subscriber footsteps_sub =
       ros_node.subscribe("/robotis/online_walking/footsteps_2d", 5, &OnlineWalkingModule::footStep2DCallback, this);
@@ -582,9 +588,12 @@ void OnlineWalkingModule::setResetBodyCallback(const std_msgs::Bool::ConstPtr& m
 {
   if (msg->data == true)
   {
-    des_body_offset_[0] = 0.0;
-    des_body_offset_[1] = 0.0;
-    des_body_offset_[2] = 0.0;
+    des_body_offset_xyz_[0] = 0.0;
+    des_body_offset_xyz_[1] = 0.0;
+    des_body_offset_xyz_[2] = 0.0;
+    des_body_offset_rpy_[0] = 0.0;
+    des_body_offset_rpy_[1] = 0.0;
+    des_body_offset_rpy_[2] = 0.0;
 
     resetBodyPose();
   }
@@ -687,9 +696,22 @@ void OnlineWalkingModule::setBodyOffsetCallback(const geometry_msgs::Pose::Const
 
   if (control_type_ == NONE || control_type_ == OFFSET_CONTROL)
   {
-    goal_body_offset_[0] = msg->position.x;
-    goal_body_offset_[1] = msg->position.y;
-    goal_body_offset_[2] = msg->position.z;
+    goal_body_offset_xyz_[0] = msg->position.x;
+    goal_body_offset_xyz_[1] = msg->position.y;
+    goal_body_offset_xyz_[2] = msg->position.z;
+    // Get RPY from quaternion
+    Eigen::Quaterniond q(msg->orientation.w, msg->orientation.x, msg->orientation.y, msg->orientation.z);
+    Eigen::Vector3d rpy = q.toRotationMatrix().eulerAngles(2, 1, 0).reverse();
+    for (int i = 0; i < 3; i++)
+    {
+      if (rpy[i] > M_PI)
+        rpy[i] -= 2.0 * M_PI;
+      else if (rpy[i] < -M_PI)
+        rpy[i] += 2.0 * M_PI;
+    }
+    goal_body_offset_rpy_[0] = rpy[0];
+    goal_body_offset_rpy_[1] = rpy[1];
+    goal_body_offset_rpy_[2] = rpy[2];
 
     body_offset_initialize_ = false;
     control_type_ = OFFSET_CONTROL;
@@ -708,6 +730,42 @@ void OnlineWalkingModule::setFootDistanceCallback(const std_msgs::Float64::Const
   resetBodyPose();
 }
 
+// void OnlineWalkingModule::setFootXOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
+// {
+//   foot_x_offset_ = msg->data;
+// }
+// void OnlineWalkingModule::setFootYOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
+// {
+//   foot_y_offset_ = msg->data;
+//   foot_distance_ = pelvis_offset_ + foot_y_offset_;
+// }
+// void OnlineWalkingModule::setFootZOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
+// {
+//   foot_z_offset_ = msg->data;
+// }
+// void OnlineWalkingModule::setFootRollOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
+// {
+//   foot_roll_offset_ = msg->data;
+// }
+// void OnlineWalkingModule::setFootPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
+// {
+//   foot_pitch_offset_ = msg->data;
+// }
+// void OnlineWalkingModule::setFootYawOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
+// {
+//   foot_yaw_offset_ = msg->data;
+// }
+
+void OnlineWalkingModule::setHipPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
+{
+  hit_pitch_offset_ = msg->data;
+}
+
+void OnlineWalkingModule::setPelvisOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
+{
+  pelvis_offset_ = msg->data;
+}
+
 void OnlineWalkingModule::initOffsetControl()
 {
   if (body_offset_initialize_ == true)
@@ -724,15 +782,19 @@ void OnlineWalkingModule::initOffsetControl()
   std::vector<double_t> offset_zero;
   offset_zero.resize(3, 0.0);
 
-  body_offset_tra_ = new robotis_framework::MinimumJerk(ini_time, mov_time, des_body_offset_, offset_zero, offset_zero,
-                                                        goal_body_offset_, offset_zero, offset_zero);
+  body_offset_xyz_tra_ =
+      new robotis_framework::MinimumJerk(ini_time, mov_time, des_body_offset_xyz_, offset_zero, offset_zero,
+                                         goal_body_offset_xyz_, offset_zero, offset_zero);
+  body_offset_rpy_tra_ =
+      new robotis_framework::MinimumJerk(ini_time, mov_time, des_body_offset_rpy_, offset_zero, offset_zero,
+                                         goal_body_offset_rpy_, offset_zero, offset_zero);
 
   if (is_moving_ == true)
-    ROS_INFO("[UPDATE] Body Offset");
+    ROS_INFO("[UPDATE] Apply Body Offset");
   else
   {
     is_moving_ = true;
-    ROS_INFO("[START] Body Offset");
+    ROS_INFO("[START] Apply Body Offset");
   }
 }
 
@@ -744,7 +806,8 @@ void OnlineWalkingModule::calcOffsetControl()
 
     queue_mutex_.lock();
 
-    des_body_offset_ = body_offset_tra_->getPosition(cur_time);
+    des_body_offset_xyz_ = body_offset_xyz_tra_->getPosition(cur_time);
+    des_body_offset_rpy_ = body_offset_rpy_tra_->getPosition(cur_time);
 
     queue_mutex_.unlock();
 
@@ -752,11 +815,11 @@ void OnlineWalkingModule::calcOffsetControl()
     {
       body_offset_step_ = 0;
       is_moving_ = false;
-      delete body_offset_tra_;
+      delete body_offset_xyz_tra_;
+      delete body_offset_rpy_tra_;
 
       control_type_ = NONE;
-
-      ROS_INFO("[END] Body Offset");
+      ROS_INFO("[END] Apply Body Offset");
     }
     else
       body_offset_step_++;
@@ -1282,7 +1345,10 @@ bool OnlineWalkingModule::setBalanceControl()
   balance_control_.setOrientationBalanceEnable(true);
   balance_control_.setForceTorqueBalanceEnable(true);
 
-  balance_control_.setCOBManualAdjustment(des_body_offset_[0], des_body_offset_[1], des_body_offset_[2]);
+  // balance_control_.setCOBManualAdjustment(des_body_offset_xyz_[0], des_body_offset_xyz_[1], des_body_offset_xyz_[2]);
+  balance_control_.setCOBManualAdjustmentX(-des_body_offset_xyz_[0] + pelvis_to_body_height_ * sin(hit_pitch_offset_));
+  balance_control_.setCOBManualAdjustmentZ(-des_body_offset_xyz_[2] - pelvis_to_body_height_ * cos(hit_pitch_offset_));
+  balance_control_.setCOBManualAdjustmentPitch(hit_pitch_offset_);
 
   setBalanceControlGain();
   setTargetForceTorque();
@@ -1434,6 +1500,14 @@ bool OnlineWalkingModule::setBalanceControl()
 
   Eigen::Quaterniond des_r_foot_Q_mod = robotis_framework::convertRotationToQuaternion(des_r_foot_rot_mod);
   Eigen::Quaterniond des_l_foot_Q_mod = robotis_framework::convertRotationToQuaternion(des_l_foot_rot_mod);
+
+  // Apply initial pose offset
+  Eigen::Quaterniond r_foot_offset = robotis_framework::convertRPYToQuaternion(
+      -des_body_offset_rpy_[0] * 0.5, des_body_offset_rpy_[1], -des_body_offset_rpy_[2] * 0.5);
+  Eigen::Quaterniond l_foot_offset = robotis_framework::convertRPYToQuaternion(
+      des_body_offset_rpy_[0] * 0.5, des_body_offset_rpy_[1], des_body_offset_rpy_[2] * 0.5);
+  des_r_foot_Q_mod = r_foot_offset * des_r_foot_Q_mod;
+  des_l_foot_Q_mod = l_foot_offset * des_l_foot_Q_mod;
 
   ik_success = op3_kdl_->solveInverseKinematics(r_leg_output, des_r_foot_pos_mod, des_r_foot_Q_mod, l_leg_output,
                                                 des_l_foot_pos_mod, des_l_foot_Q_mod);
