@@ -268,7 +268,6 @@ private:
   double foot_distance_;
   double pelvis_to_body_height_;
   double ground_to_pelvis_height_;
-  double ground_to_pelvis_height_offset_;
 
   // Balance Gain
   double foot_roll_gyro_p_gain_;

@@ -36,8 +36,8 @@ OnlineWalkingModule::OnlineWalkingModule()
   , walking_phase_(DSP)
   , total_mass_(3.5)
   , foot_distance_(0.07)
-  , pelvis_to_body_height_(0.0907)
-  , ground_to_pelvis_height_(0.2495)
+  , pelvis_to_body_height_(0.09)
+  , ground_to_pelvis_height_(0.25)
   , pelvis_offset_(0.5)
   , leg_length_(0.3)
 {
@@ -621,13 +621,20 @@ void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs
     return;
   op3_walking_module_msgs::WalkingParam walking_param = msg;
   ROS_INFO("Set Walking Parameter");
-  ROS_INFO("DSP Ratio : %f", walking_param.dsp_ratio);
   ROS_INFO("Initial Body offset: x: %f, z: %f, pitch: %f", walking_param.init_x_offset, walking_param.init_z_offset,
            walking_param.hip_pitch_offset);
   ROS_INFO("Initial Foot Offset: roll: %f, pitch: %f, yaw: %f", walking_param.init_roll_offset,
            walking_param.init_pitch_offset, walking_param.init_yaw_offset);
   ROS_INFO("Initial Foot Separation: %f", walking_param_.init_y_offset);
-  // ground_to_pelvis_height_ = leg_length_ + walking_param_.init_z_offset;
+  ROS_INFO("DSP Ratio : %f", walking_param.dsp_ratio);
+  ROS_INFO("LIPM Height : %f", leg_length_ + walking_param_.init_z_offset + pelvis_to_body_height_);
+  ROS_INFO("Foot Height Max: %f", walking_param.z_move_amplitude);
+
+  dsp_ratio_ = walking_param.dsp_ratio;
+  ground_to_pelvis_height_ = leg_length_ + walking_param_.init_z_offset;
+  lipm_height_ = ground_to_pelvis_height_ + pelvis_to_body_height_;
+  foot_distance_ = walking_param_.init_y_offset;
+  foot_height_max_ = walking_param.z_move_amplitude;
 }
 
 void OnlineWalkingModule::goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg)
@@ -949,21 +956,21 @@ void OnlineWalkingModule::footStep2DCallback(const op3_online_walking_module_msg
   {
     first_msg.step2d.x = des_l_leg_pos_[0];
     first_msg.step2d.y = des_l_leg_pos_[1];
-    first_msg.step2d.theta = body_rpy.coeff(2, 0);  // 0.0;
+    first_msg.step2d.theta = body_rpy.coeff(2, 0);
 
     second_msg.step2d.x = des_r_leg_pos_[0];
     second_msg.step2d.y = des_r_leg_pos_[1];
-    second_msg.step2d.theta = body_rpy.coeff(2, 0);  // 0.0;
+    second_msg.step2d.theta = body_rpy.coeff(2, 0);
   }
   else if (first_msg.moving_foot == RIGHT_LEG)
   {
     first_msg.step2d.x = des_r_leg_pos_[0];
     first_msg.step2d.y = des_r_leg_pos_[1];
-    first_msg.step2d.theta = body_rpy.coeff(2, 0);  // 0.0;
+    first_msg.step2d.theta = body_rpy.coeff(2, 0);
 
     second_msg.step2d.x = des_l_leg_pos_[0];
     second_msg.step2d.y = des_l_leg_pos_[1];
-    second_msg.step2d.theta = body_rpy.coeff(2, 0);  // 0.0;
+    second_msg.step2d.theta = body_rpy.coeff(2, 0);
   }
 
   foot_step_msg.footsteps_2d.push_back(first_msg);
@@ -1011,7 +1018,7 @@ void OnlineWalkingModule::footStep2DCallback(const op3_online_walking_module_msg
 
     first_msg.step2d.x = 0.0;
     first_msg.step2d.y = 0.0;
-    first_msg.step2d.theta = step_final_theta;  // step_msg.step2d.theta;
+    first_msg.step2d.theta = step_final_theta;
 
     foot_step_msg.footsteps_2d.push_back(first_msg);
 
@@ -1019,7 +1026,7 @@ void OnlineWalkingModule::footStep2DCallback(const op3_online_walking_module_msg
     foot_step_2d_.step_time = msg.step_time;
 
     walking_size_ = new_size;
-    mov_time_ = msg.step_time;  // 1.0;
+    mov_time_ = msg.step_time;
     is_foot_step_2d_ = true;
     control_type_ = WALKING_CONTROL;
 
@@ -1047,7 +1054,7 @@ void OnlineWalkingModule::footStepCommandCallback(const op3_online_walking_modul
 
   if (control_type_ == NONE || control_type_ == WALKING_CONTROL)
   {
-    walking_size_ = msg.step_num + 3;  // msg.step_num + 2;
+    walking_size_ = msg.step_num + 3;
     mov_time_ = msg.step_time;
 
     foot_step_command_ = msg;
