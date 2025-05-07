@@ -125,8 +125,6 @@ OnlineWalkingModule::OnlineWalkingModule()
   dsp_ratio_ = 0.2;
   lipm_height_ = 0.12;
   foot_height_max_ = 0.05;
-  zmp_offset_x_ = 0.0;  // not applied
-  zmp_offset_y_ = 0.0;
 
   des_balance_gain_ratio_.resize(1, 0.0);
   goal_balance_gain_ratio_.resize(1, 0.0);
@@ -612,13 +610,9 @@ void OnlineWalkingModule::onlineWalkingParamCallback(const op3_online_walking_mo
   ROS_INFO("DSP Ratio : %f", online_walking_param.dsp_ratio);
   ROS_INFO("LIPM Height : %f", online_walking_param.lipm_height);
   ROS_INFO("Foot Height Max : %f", online_walking_param.foot_height_max);
-  ROS_INFO("ZMP Offset X : %f", online_walking_param.zmp_offset_x);
-  ROS_INFO("ZMP Offset Y : %f", online_walking_param.zmp_offset_y);
   dsp_ratio_ = online_walking_param.dsp_ratio;
   lipm_height_ = online_walking_param.lipm_height;
   foot_height_max_ = online_walking_param.foot_height_max;
-  zmp_offset_x_ = online_walking_param.zmp_offset_x;
-  zmp_offset_y_ = online_walking_param.zmp_offset_y;
 }
 
 void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg)
@@ -1079,8 +1073,8 @@ void OnlineWalkingModule::initWalkingControl()
 
   walking_step_ = 0;
 
-  walking_control_ = new WalkingControl(control_cycle_sec_, dsp_ratio_, lipm_height_, foot_height_max_, zmp_offset_x_,
-                                        zmp_offset_y_, x_lipm_, y_lipm_, foot_distance_);
+  walking_control_ = new WalkingControl(control_cycle_sec_, dsp_ratio_, lipm_height_, foot_height_max_, x_lipm_,
+                                        y_lipm_, foot_distance_);
 
   double lipm_height = walking_control_->getLipmHeight();
   preview_request_.lipm_height = lipm_height;

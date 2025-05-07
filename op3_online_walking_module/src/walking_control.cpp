@@ -20,8 +20,7 @@
 #include "op3_online_walking_module/walking_control.h"
 
 WalkingControl::WalkingControl(double control_cycle, double dsp_ratio, double lipm_height, double foot_height_max,
-                               double zmp_offset_x, double zmp_offset_y, std::vector<double_t> x_lipm,
-                               std::vector<double_t> y_lipm, double foot_distance)
+                               std::vector<double_t> x_lipm, std::vector<double_t> y_lipm, double foot_distance)
   : walking_leg_(LEG_COUNT), walking_phase_(PHASE_COUNT)
 {
   control_cycle_ = control_cycle;
@@ -46,10 +45,6 @@ WalkingControl::WalkingControl(double control_cycle, double dsp_ratio, double li
   preview_time_ = 1.6;
   lipm_height_ = lipm_height;  // default:
   preview_size_ = round(preview_time_ / control_cycle_) + 1;
-
-  // ZMP Offset Parameter
-  zmp_offset_x_ = zmp_offset_x;  // default :
-  zmp_offset_y_ = zmp_offset_y;  // default :
 
   // Initialization
   init_body_pos_.resize(3, 0.0);
@@ -551,12 +546,12 @@ void WalkingControl::calcRefZMP(int step)
 {
   if (step == 0 || step == 1)
   {
-    ref_zmp_x_ = 0.5 * (goal_r_foot_pos_[0] + goal_l_foot_pos_[0]);  // + zmp_offset_x_;
+    ref_zmp_x_ = 0.5 * (goal_r_foot_pos_[0] + goal_l_foot_pos_[0]);
     ref_zmp_y_ = 0.5 * (goal_r_foot_pos_[1] + goal_l_foot_pos_[1]);
   }
   else if (step == foot_step_size_ - 1)
   {
-    ref_zmp_x_ = 0.5 * (goal_r_foot_pos_[0] + goal_l_foot_pos_[0]);  // + zmp_offset_x_;
+    ref_zmp_x_ = 0.5 * (goal_r_foot_pos_[0] + goal_l_foot_pos_[0]);
     ref_zmp_y_ = 0.5 * (goal_r_foot_pos_[1] + goal_l_foot_pos_[1]);
   }
   else
@@ -564,12 +559,12 @@ void WalkingControl::calcRefZMP(int step)
     if (foot_step_param_.moving_foot[step] == LEFT_LEG)
     {
       ref_zmp_x_ = goal_r_foot_pos_[0];
-      ref_zmp_y_ = goal_r_foot_pos_[1] - zmp_offset_y_;
+      ref_zmp_y_ = goal_r_foot_pos_[1];
     }
     else if (foot_step_param_.moving_foot[step] == RIGHT_LEG)
     {
       ref_zmp_x_ = goal_l_foot_pos_[0];
-      ref_zmp_y_ = goal_l_foot_pos_[1] + zmp_offset_y_;
+      ref_zmp_y_ = goal_l_foot_pos_[1];
     }
   }
 }
@@ -635,13 +630,12 @@ double WalkingControl::calcRefZMPx(int step)
 
   if (step == 0 || step == 1)
   {
-    ref_zmp_x =
-        0.5 * (goal_r_foot_pos_buffer_.coeff(step, 0) + goal_l_foot_pos_buffer_.coeff(step, 0));  // + zmp_offset_x_;
+    ref_zmp_x = 0.5 * (goal_r_foot_pos_buffer_.coeff(step, 0) + goal_l_foot_pos_buffer_.coeff(step, 0));
   }
   else if (step >= foot_step_size_ - 1)
   {
     ref_zmp_x = 0.5 * (goal_r_foot_pos_buffer_.coeff(foot_step_size_ - 1, 0) +
-                       goal_l_foot_pos_buffer_.coeff(foot_step_size_ - 1, 0));  // + zmp_offset_x_;
+                       goal_l_foot_pos_buffer_.coeff(foot_step_size_ - 1, 0));
   }
   else
   {
@@ -670,9 +664,9 @@ double WalkingControl::calcRefZMPy(int step)
   else
   {
     if (foot_step_param_.moving_foot[step] == LEFT_LEG)
-      ref_zmp_y = goal_r_foot_pos_buffer_.coeff(step, 1) - zmp_offset_y_;
+      ref_zmp_y = goal_r_foot_pos_buffer_.coeff(step, 1);
     else if (foot_step_param_.moving_foot[step] == RIGHT_LEG)
-      ref_zmp_y = goal_l_foot_pos_buffer_.coeff(step, 1) + zmp_offset_y_;
+      ref_zmp_y = goal_l_foot_pos_buffer_.coeff(step, 1);
   }
 
   return ref_zmp_y;
