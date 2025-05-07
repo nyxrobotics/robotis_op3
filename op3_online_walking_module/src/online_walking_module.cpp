@@ -218,12 +218,6 @@ void OnlineWalkingModule::queueThread()
       "/robotis/online_walking/wholebody_balance_msg", 5, &OnlineWalkingModule::setWholebodyBalanceMsgCallback, this);
   ros::Subscriber body_offset_msg_sub =
       ros_node.subscribe("/robotis/online_walking/body_offset", 5, &OnlineWalkingModule::setBodyOffsetCallback, this);
-  ros::Subscriber foot_distance_msg_sub = ros_node.subscribe("/robotis/online_walking/foot_distance", 5,
-                                                             &OnlineWalkingModule::setFootDistanceCallback, this);
-  ros::Subscriber hip_pitch_offset_msg_sub = ros_node.subscribe("/robotis/online_walking/hip_pitch_offset", 5,
-                                                                &OnlineWalkingModule::setHipPitchOffsetCallback, this);
-  ros::Subscriber pelvis_offset_msg_sub = ros_node.subscribe("/robotis/online_walking/pelvis_offset", 5,
-                                                             &OnlineWalkingModule::setPelvisOffsetCallback, this);
 
   ros::Subscriber footsteps_sub =
       ros_node.subscribe("/robotis/online_walking/footsteps_2d", 5, &OnlineWalkingModule::footStep2DCallback, this);
@@ -613,12 +607,16 @@ void OnlineWalkingModule::onlineWalkingParamCallback(const op3_walking_module_ms
   ROS_INFO("DSP Ratio : %f", walking_param.dsp_ratio);
   ROS_INFO("LIPM Height : %f", leg_length_ + walking_param_.init_z_offset + pelvis_to_body_height_);
   ROS_INFO("Foot Height Max: %f", walking_param.z_move_amplitude);
+  ROS_INFO("Pelvis to Body Height: %f", pelvis_to_body_height_);
 
   dsp_ratio_ = walking_param.dsp_ratio;
   ground_to_pelvis_height_ = leg_length_ + walking_param_.init_z_offset;
   lipm_height_ = ground_to_pelvis_height_ + pelvis_to_body_height_;
   foot_distance_ = walking_param_.init_y_offset;
   foot_height_max_ = walking_param.z_move_amplitude;
+  hit_pitch_offset_ = walking_param.hip_pitch_offset;
+  pelvis_offset_ = walking_param.pelvis_offset;
+  resetBodyPose();
 }
 
 void OnlineWalkingModule::goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg)
@@ -735,28 +733,6 @@ void OnlineWalkingModule::setBodyOffsetCallback(const geometry_msgs::Pose::Const
   }
   else
     ROS_WARN("[WARN] Control type is different!");
-}
-
-void OnlineWalkingModule::setFootDistanceCallback(const std_msgs::Float64::ConstPtr& msg)
-{
-  if (enable_ == false)
-    return;
-
-  ROS_INFO("[INFO] Set Foot Distance: %f", msg->data);
-
-  foot_distance_ = msg->data;
-
-  resetBodyPose();
-}
-
-void OnlineWalkingModule::setHipPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
-{
-  hit_pitch_offset_ = msg->data;
-}
-
-void OnlineWalkingModule::setPelvisOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
-{
-  pelvis_offset_ = msg->data;
 }
 
 void OnlineWalkingModule::initOffsetControl()

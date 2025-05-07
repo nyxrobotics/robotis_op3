@@ -90,9 +90,6 @@ public:
   void setResetBodyCallback(const std_msgs::Bool::ConstPtr& msg);
   void setWholebodyBalanceMsgCallback(const std_msgs::String::ConstPtr& msg);
   void setBodyOffsetCallback(const geometry_msgs::Pose::ConstPtr& msg);
-  void setFootDistanceCallback(const std_msgs::Float64::ConstPtr& msg);
-  void setHipPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
-  void setPelvisOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
 
   void goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg);
   void goalKinematicsPoseCallback(const op3_online_walking_module_msgs::KinematicsPose& msg);
