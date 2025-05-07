@@ -213,6 +213,8 @@ void OnlineWalkingModule::queueThread()
                                                              &OnlineWalkingModule::footStepCommandCallback, this);
   ros::Subscriber online_walking_param_sub = ros_node.subscribe("/robotis/online_walking/walking_param", 5,
                                                                 &OnlineWalkingModule::onlineWalkingParamCallback, this);
+  ros::Subscriber walking_param_sub =
+      ros_node.subscribe("/robotis/walking/set_params", 0, &OnlineWalkingModule::walkingParameterCallback, this);
 
   ros::Subscriber wholebody_balance_msg_sub = ros_node.subscribe(
       "/robotis/online_walking/wholebody_balance_msg", 5, &OnlineWalkingModule::setWholebodyBalanceMsgCallback, this);
@@ -602,6 +604,12 @@ void OnlineWalkingModule::setResetBodyCallback(const std_msgs::Bool::ConstPtr& m
 void OnlineWalkingModule::onlineWalkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg)
 {
   online_walking_param_ = msg;
+}
+
+void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg)
+{
+  
+  walking_param_ = msg;
 }
 
 void OnlineWalkingModule::goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg)

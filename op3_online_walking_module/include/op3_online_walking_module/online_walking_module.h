@@ -54,13 +54,13 @@
 #include "op3_online_walking_module_msgs/PreviewRequest.h"
 #include "op3_online_walking_module_msgs/PreviewResponse.h"
 #include "op3_online_walking_module_msgs/WalkingParam.h"
-
 #include "op3_online_walking_module_msgs/GetJointPose.h"
 #include "op3_online_walking_module_msgs/GetKinematicsPose.h"
 #include "op3_online_walking_module_msgs/GetPreviewMatrix.h"
-
 #include "op3_online_walking_module_msgs/Step2D.h"
 #include "op3_online_walking_module_msgs/Step2DArray.h"
+
+#include "op3_walking_module_msgs/WalkingParam.h"
 
 namespace robotis_op
 {
@@ -104,6 +104,7 @@ public:
   void goalKinematicsPoseCallback(const op3_online_walking_module_msgs::KinematicsPose& msg);
   void footStepCommandCallback(const op3_online_walking_module_msgs::FootStepCommand& msg);
   void onlineWalkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg);
+  void walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg);
 
   void footStep2DCallback(const op3_online_walking_module_msgs::Step2DArray& msg);
 
@@ -229,6 +230,7 @@ private:
   op3_online_walking_module_msgs::PreviewRequest preview_request_;
   op3_online_walking_module_msgs::PreviewResponse preview_response_;
   op3_online_walking_module_msgs::WalkingParam online_walking_param_;
+  op3_walking_module_msgs::WalkingParam walking_param_;
 
   op3_online_walking_module_msgs::Step2DArray foot_step_2d_;
   bool is_foot_step_2d_;
