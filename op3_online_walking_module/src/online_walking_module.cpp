@@ -39,6 +39,7 @@ OnlineWalkingModule::OnlineWalkingModule()
   , pelvis_to_body_height_(0.0907)
   , ground_to_pelvis_height_(0.2495)
   , pelvis_offset_(0.5)
+  , leg_length_(0.3)
 {
   enable_ = false;
   module_name_ = "online_walking_module";
@@ -608,6 +609,11 @@ void OnlineWalkingModule::onlineWalkingParamCallback(const op3_online_walking_mo
     return;
   online_walking_param_ = msg;
   ROS_INFO("Set Online Walking Parameter");
+  ROS_INFO("DSP Ratio : %f", online_walking_param_.dsp_ratio);
+  ROS_INFO("LIPM Height : %f", online_walking_param_.lipm_height);
+  ROS_INFO("Foot Height Max : %f", online_walking_param_.foot_height_max);
+  ROS_INFO("ZMP Offset X : %f", online_walking_param_.zmp_offset_x);
+  ROS_INFO("ZMP Offset Y : %f", online_walking_param_.zmp_offset_y);
 }
 
 void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg)
@@ -622,6 +628,7 @@ void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs
   ROS_INFO("Initial Foot Offset: roll: %f, pitch: %f, yaw: %f", walking_param_.init_roll_offset,
            walking_param_.init_pitch_offset, walking_param_.init_yaw_offset);
   ROS_INFO("Initial Foot Separation: %f", walking_param_.init_y_offset);
+  // ground_to_pelvis_height_ = leg_length_ + walking_param_.init_z_offset;
 }
 
 void OnlineWalkingModule::goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg)

@@ -225,6 +225,7 @@ private:
   op3_online_walking_module_msgs::PreviewResponse preview_response_;
   op3_online_walking_module_msgs::WalkingParam online_walking_param_;
   op3_walking_module_msgs::WalkingParam walking_param_;
+  double leg_length_;
 
   op3_online_walking_module_msgs::Step2DArray foot_step_2d_;
   bool is_foot_step_2d_;
