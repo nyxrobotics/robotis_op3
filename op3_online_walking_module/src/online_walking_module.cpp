@@ -604,12 +604,19 @@ void OnlineWalkingModule::setResetBodyCallback(const std_msgs::Bool::ConstPtr& m
 void OnlineWalkingModule::onlineWalkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg)
 {
   online_walking_param_ = msg;
+  ROS_INFO("Set Online Walking Parameter");
 }
 
 void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg)
 {
-  
   walking_param_ = msg;
+  ROS_INFO("Set Walking Parameter");
+  ROS_INFO("DSP Ratio : %f", walking_param_.dsp_ratio);
+  ROS_INFO("Initial Body offset: x: %f, z: %f, pitch: %f", walking_param_.init_x_offset, walking_param_.init_z_offset,
+           walking_param_.hip_pitch_offset);
+  ROS_INFO("Initial Foot Offset: roll: %f, pitch: %f, yaw: %f", walking_param_.init_roll_offset,
+           walking_param_.init_pitch_offset, walking_param_.init_yaw_offset);
+  ROS_INFO("Initial Foot Separation: %f", pelvis_offset_ + walking_param_.init_y_offset);
 }
 
 void OnlineWalkingModule::goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg)
@@ -737,32 +744,6 @@ void OnlineWalkingModule::setFootDistanceCallback(const std_msgs::Float64::Const
 
   resetBodyPose();
 }
-
-// void OnlineWalkingModule::setFootXOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
-// {
-//   foot_x_offset_ = msg->data;
-// }
-// void OnlineWalkingModule::setFootYOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
-// {
-//   foot_y_offset_ = msg->data;
-//   foot_distance_ = pelvis_offset_ + foot_y_offset_;
-// }
-// void OnlineWalkingModule::setFootZOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
-// {
-//   foot_z_offset_ = msg->data;
-// }
-// void OnlineWalkingModule::setFootRollOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
-// {
-//   foot_roll_offset_ = msg->data;
-// }
-// void OnlineWalkingModule::setFootPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
-// {
-//   foot_pitch_offset_ = msg->data;
-// }
-// void OnlineWalkingModule::setFootYawOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
-// {
-//   foot_yaw_offset_ = msg->data;
-// }
 
 void OnlineWalkingModule::setHipPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg)
 {

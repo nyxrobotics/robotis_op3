@@ -91,12 +91,6 @@ public:
   void setWholebodyBalanceMsgCallback(const std_msgs::String::ConstPtr& msg);
   void setBodyOffsetCallback(const geometry_msgs::Pose::ConstPtr& msg);
   void setFootDistanceCallback(const std_msgs::Float64::ConstPtr& msg);
-  // void setFootXOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
-  // void setFootYOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
-  // void setFootZOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
-  // void setFootRollOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
-  // void setFootPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
-  // void setFootYawOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
   void setHipPitchOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
   void setPelvisOffsetCallback(const std_msgs::Float64::ConstPtr& msg);
 
