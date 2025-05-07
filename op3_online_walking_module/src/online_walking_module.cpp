@@ -213,8 +213,6 @@ void OnlineWalkingModule::queueThread()
                                                              &OnlineWalkingModule::footStepCommandCallback, this);
   ros::Subscriber online_walking_param_sub = ros_node.subscribe("/robotis/online_walking/walking_param", 5,
                                                                 &OnlineWalkingModule::onlineWalkingParamCallback, this);
-  ros::Subscriber walking_param_sub =
-      ros_node.subscribe("/robotis/walking/set_params", 0, &OnlineWalkingModule::walkingParameterCallback, this);
 
   ros::Subscriber wholebody_balance_msg_sub = ros_node.subscribe(
       "/robotis/online_walking/wholebody_balance_msg", 5, &OnlineWalkingModule::setWholebodyBalanceMsgCallback, this);
@@ -601,21 +599,7 @@ void OnlineWalkingModule::setResetBodyCallback(const std_msgs::Bool::ConstPtr& m
   }
 }
 
-void OnlineWalkingModule::onlineWalkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg)
-{
-  if (enable_ == false)
-    return;
-  op3_online_walking_module_msgs::WalkingParam online_walking_param = msg;
-  ROS_INFO("Set Online Walking Parameter");
-  ROS_INFO("DSP Ratio : %f", online_walking_param.dsp_ratio);
-  ROS_INFO("LIPM Height : %f", online_walking_param.lipm_height);
-  ROS_INFO("Foot Height Max : %f", online_walking_param.foot_height_max);
-  dsp_ratio_ = online_walking_param.dsp_ratio;
-  lipm_height_ = online_walking_param.lipm_height;
-  foot_height_max_ = online_walking_param.foot_height_max;
-}
-
-void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg)
+void OnlineWalkingModule::onlineWalkingParamCallback(const op3_walking_module_msgs::WalkingParam& msg)
 {
   if (enable_ == false)
     return;

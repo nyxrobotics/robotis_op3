@@ -97,8 +97,7 @@ public:
   void goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg);
   void goalKinematicsPoseCallback(const op3_online_walking_module_msgs::KinematicsPose& msg);
   void footStepCommandCallback(const op3_online_walking_module_msgs::FootStepCommand& msg);
-  void onlineWalkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg);
-  void walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg);
+  void onlineWalkingParamCallback(const op3_walking_module_msgs::WalkingParam& msg);
 
   void footStep2DCallback(const op3_online_walking_module_msgs::Step2DArray& msg);
 
