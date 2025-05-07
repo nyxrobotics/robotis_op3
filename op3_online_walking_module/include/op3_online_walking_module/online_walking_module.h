@@ -223,7 +223,8 @@ private:
   op3_online_walking_module_msgs::FootStepCommand foot_step_command_;
   op3_online_walking_module_msgs::PreviewRequest preview_request_;
   op3_online_walking_module_msgs::PreviewResponse preview_response_;
-  op3_online_walking_module_msgs::WalkingParam online_walking_param_;
+  // Online Walking Params
+  double dsp_ratio_, lipm_height_, foot_height_max_, zmp_offset_x_, zmp_offset_y_;
   op3_walking_module_msgs::WalkingParam walking_param_;
   double leg_length_;
 

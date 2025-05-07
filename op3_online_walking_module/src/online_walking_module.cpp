@@ -121,12 +121,12 @@ OnlineWalkingModule::OnlineWalkingModule()
 
   resetBodyPose();
 
-  // walking parameter default
-  online_walking_param_.dsp_ratio = 0.2;
-  online_walking_param_.lipm_height = 0.12;
-  online_walking_param_.foot_height_max = 0.05;
-  online_walking_param_.zmp_offset_x = 0.0;  // not applied
-  online_walking_param_.zmp_offset_y = 0.0;
+  // Online Walking Parameter Default Values
+  dsp_ratio_ = 0.2;
+  lipm_height_ = 0.12;
+  foot_height_max_ = 0.05;
+  zmp_offset_x_ = 0.0;  // not applied
+  zmp_offset_y_ = 0.0;
 
   des_balance_gain_ratio_.resize(1, 0.0);
   goal_balance_gain_ratio_.resize(1, 0.0);
@@ -607,26 +607,31 @@ void OnlineWalkingModule::onlineWalkingParamCallback(const op3_online_walking_mo
 {
   if (enable_ == false)
     return;
-  online_walking_param_ = msg;
+  op3_online_walking_module_msgs::WalkingParam online_walking_param = msg;
   ROS_INFO("Set Online Walking Parameter");
-  ROS_INFO("DSP Ratio : %f", online_walking_param_.dsp_ratio);
-  ROS_INFO("LIPM Height : %f", online_walking_param_.lipm_height);
-  ROS_INFO("Foot Height Max : %f", online_walking_param_.foot_height_max);
-  ROS_INFO("ZMP Offset X : %f", online_walking_param_.zmp_offset_x);
-  ROS_INFO("ZMP Offset Y : %f", online_walking_param_.zmp_offset_y);
+  ROS_INFO("DSP Ratio : %f", online_walking_param.dsp_ratio);
+  ROS_INFO("LIPM Height : %f", online_walking_param.lipm_height);
+  ROS_INFO("Foot Height Max : %f", online_walking_param.foot_height_max);
+  ROS_INFO("ZMP Offset X : %f", online_walking_param.zmp_offset_x);
+  ROS_INFO("ZMP Offset Y : %f", online_walking_param.zmp_offset_y);
+  dsp_ratio_ = online_walking_param.dsp_ratio;
+  lipm_height_ = online_walking_param.lipm_height;
+  foot_height_max_ = online_walking_param.foot_height_max;
+  zmp_offset_x_ = online_walking_param.zmp_offset_x;
+  zmp_offset_y_ = online_walking_param.zmp_offset_y;
 }
 
 void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg)
 {
   if (enable_ == false)
     return;
-  walking_param_ = msg;
+  op3_walking_module_msgs::WalkingParam walking_param = msg;
   ROS_INFO("Set Walking Parameter");
-  ROS_INFO("DSP Ratio : %f", walking_param_.dsp_ratio);
-  ROS_INFO("Initial Body offset: x: %f, z: %f, pitch: %f", walking_param_.init_x_offset, walking_param_.init_z_offset,
-           walking_param_.hip_pitch_offset);
-  ROS_INFO("Initial Foot Offset: roll: %f, pitch: %f, yaw: %f", walking_param_.init_roll_offset,
-           walking_param_.init_pitch_offset, walking_param_.init_yaw_offset);
+  ROS_INFO("DSP Ratio : %f", walking_param.dsp_ratio);
+  ROS_INFO("Initial Body offset: x: %f, z: %f, pitch: %f", walking_param.init_x_offset, walking_param.init_z_offset,
+           walking_param.hip_pitch_offset);
+  ROS_INFO("Initial Foot Offset: roll: %f, pitch: %f, yaw: %f", walking_param.init_roll_offset,
+           walking_param.init_pitch_offset, walking_param.init_yaw_offset);
   ROS_INFO("Initial Foot Separation: %f", walking_param_.init_y_offset);
   // ground_to_pelvis_height_ = leg_length_ + walking_param_.init_z_offset;
 }
@@ -1074,10 +1079,8 @@ void OnlineWalkingModule::initWalkingControl()
 
   walking_step_ = 0;
 
-  walking_control_ =
-      new WalkingControl(control_cycle_sec_, online_walking_param_.dsp_ratio, online_walking_param_.lipm_height,
-                         online_walking_param_.foot_height_max, online_walking_param_.zmp_offset_x,
-                         online_walking_param_.zmp_offset_y, x_lipm_, y_lipm_, foot_distance_);
+  walking_control_ = new WalkingControl(control_cycle_sec_, dsp_ratio_, lipm_height_, foot_height_max_, zmp_offset_x_,
+                                        zmp_offset_y_, x_lipm_, y_lipm_, foot_distance_);
 
   double lipm_height = walking_control_->getLipmHeight();
   preview_request_.lipm_height = lipm_height;
@@ -1176,9 +1179,8 @@ void OnlineWalkingModule::initFeedforwardControl()
   double init_time = 0.0;
   double fin_time = mov_time_;
   double via_time = 0.5 * (init_time + fin_time);
-  double dsp_ratio = online_walking_param_.dsp_ratio;
 
-  feed_forward_tra_ = new robotis_framework::MinimumJerkViaPoint(init_time, fin_time, via_time, dsp_ratio, zero_vector,
+  feed_forward_tra_ = new robotis_framework::MinimumJerkViaPoint(init_time, fin_time, via_time, dsp_ratio_, zero_vector,
                                                                  zero_vector, zero_vector, zero_vector, zero_vector,
                                                                  zero_vector, via_pos, zero_vector, zero_vector);
 }
