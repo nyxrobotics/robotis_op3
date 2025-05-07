@@ -17,6 +17,7 @@
 /* Author: SCH */
 
 #include "op3_online_walking_module/online_walking_module.h"
+#include "ros/console.h"
 
 using namespace robotis_op;
 
@@ -603,12 +604,16 @@ void OnlineWalkingModule::setResetBodyCallback(const std_msgs::Bool::ConstPtr& m
 
 void OnlineWalkingModule::onlineWalkingParamCallback(const op3_online_walking_module_msgs::WalkingParam& msg)
 {
+  if (enable_ == false)
+    return;
   online_walking_param_ = msg;
   ROS_INFO("Set Online Walking Parameter");
 }
 
 void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs::WalkingParam& msg)
 {
+  if (enable_ == false)
+    return;
   walking_param_ = msg;
   ROS_INFO("Set Walking Parameter");
   ROS_INFO("DSP Ratio : %f", walking_param_.dsp_ratio);
@@ -616,7 +621,7 @@ void OnlineWalkingModule::walkingParameterCallback(const op3_walking_module_msgs
            walking_param_.hip_pitch_offset);
   ROS_INFO("Initial Foot Offset: roll: %f, pitch: %f, yaw: %f", walking_param_.init_roll_offset,
            walking_param_.init_pitch_offset, walking_param_.init_yaw_offset);
-  ROS_INFO("Initial Foot Separation: %f", pelvis_offset_ + walking_param_.init_y_offset);
+  ROS_INFO("Initial Foot Separation: %f", walking_param_.init_y_offset);
 }
 
 void OnlineWalkingModule::goalJointPoseCallback(const op3_online_walking_module_msgs::JointPose& msg)
@@ -739,6 +744,8 @@ void OnlineWalkingModule::setFootDistanceCallback(const std_msgs::Float64::Const
 {
   if (enable_ == false)
     return;
+
+  ROS_INFO("[INFO] Set Foot Distance: %f", msg->data);
 
   foot_distance_ = msg->data;
 
